@@ -1,16 +1,16 @@
 <view class="page mine-page">
   <!-- 未登录 -->
   <block wx:if="{{!loggedIn}}">
-    <view class="profile-header" bindtap="onLoginTap">
+    <view class="profile-header profile-header-guest" bindtap="onLoginTap">
       <view class="avatar avatar-guest">👤</view>
-      <view>
+      <view class="guest-info">
         <view class="name text-primary">点击登录</view>
         <view class="text-faint sub">登录后体验完整功能</view>
       </view>
     </view>
 
-    <view class="page-pad">
-      <view class="grid-3 mt-4">
+    <view class="page-pad mine-content">
+      <view class="grid-3 mine-section">
         <view class="card grid-item dim" data-type="history" bindtap="onGridTap">
           <view class="grid-icon blue">🕐</view>
           <text class="grid-label">创作历史</text>
@@ -25,14 +25,14 @@
         </view>
       </view>
 
-      <view class="card login-modal mt-8">
+      <view class="card login-modal mine-section">
         <view class="modal-icon">!</view>
         <view class="modal-title">请先登录以使用该功能</view>
         <view class="text-muted modal-desc">登录后可使用创作、签到、导出等完整功能</view>
-        <button class="btn-primary mt-4" bindtap="onLoginTap">微信一键登录</button>
+        <button class="btn-primary login-btn" bindtap="onLoginTap">微信一键登录</button>
       </view>
 
-      <view class="footer-links">
+      <view class="footer-links mine-section">
         <text class="text-faint link">隐私政策</text>
         <text class="text-faint link">用户协议</text>
       </view>
@@ -57,8 +57,8 @@
       </view>
     </view>
 
-    <view class="page-pad scroll-body">
-      <view class="grid-3 mt-4">
+    <view class="page-pad scroll-body mine-content">
+      <view class="grid-3 mine-section">
         <view class="card grid-item" data-type="history" bindtap="onGridTap">
           <view class="grid-icon blue">🕐</view>
           <text class="grid-label">创作历史</text>
@@ -76,7 +76,7 @@
         </view>
       </view>
 
-      <view class="card fav-card mt-4">
+      <view class="card fav-card mine-section">
         <view class="fav-head">
           <text class="fav-title">我的收藏</text>
           <text class="text-faint">3 篇 →</text>
@@ -90,7 +90,7 @@
         </view>
       </view>
 
-      <view class="card settings mt-4">
+      <view class="card settings mine-section">
         <view class="setting-item" bindtap="onClearCache">
           <text>清除缓存</text>
           <text class="text-faint">›</text>

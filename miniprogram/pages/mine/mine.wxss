@@ -1,5 +1,31 @@
 .mine-page { padding-bottom: 140rpx; }
 
+/* 各功能模块间距 */
+.mine-content {
+  padding-top: 20rpx;
+}
+
+.mine-content .mine-section + .mine-section {
+  margin-top: 20rpx;
+}
+
+/* 未登录：点击登录区域居中 */
+.profile-header-guest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40rpx 32rpx;
+  gap: 20rpx;
+}
+
+.guest-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .profile-row {
   display: flex;
   align-items: center;
@@ -98,13 +124,16 @@
   margin: 0 auto 24rpx;
 }
 .modal-title { font-size: 28rpx; font-weight: 500; }
-.modal-desc { font-size: 24rpx; margin-top: 8rpx; margin-bottom: 16rpx; }
+.modal-desc { font-size: 24rpx; margin-top: 12rpx; margin-bottom: 20rpx; }
+
+.login-btn {
+  margin-top: 20rpx;
+}
 
 .footer-links {
   display: flex;
   justify-content: center;
   gap: 48rpx;
-  margin-top: 64rpx;
   padding-bottom: 32rpx;
 }
 .link { font-size: 24rpx; text-decoration: underline; }
@@ -149,4 +178,3 @@
 .setting-item:last-child { border-bottom: none; }
 
 .scroll-body { padding-bottom: 32rpx; }
-.mt-8 { margin-top: 64rpx; }
