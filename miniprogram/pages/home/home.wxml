@@ -1,0 +1,72 @@
+<view class="page page-pad">
+  <view class="bleed-x bg-white search-section">
+    <view class="search-box" bindtap="goSearch">
+      <text class="search-icon">🔍</text>
+      <text class="text-faint">搜索论文模板或提示词</text>
+    </view>
+    <view class="filter-row">
+      <view
+        wx:for="{{filters}}"
+        wx:key="*this"
+        class="tag {{activeFilter === index ? 'tag-active' : 'tag-normal'}}"
+        data-index="{{index}}"
+        bindtap="onFilterTap"
+      >{{item}}</view>
+    </view>
+    </view>
+
+    <view class="tip-bar">
+      <text class="tip-icon">★</text>
+      <text class="text-primary tip-text">每日签到得积分，畅享 docx 导出</text>
+    </view>
+
+    <view class="waterfall">
+      <view class="waterfall-col">
+        <view
+          wx:for="{{leftCol}}"
+          wx:key="id"
+          class="card template-card"
+          data-id="{{item.id}}"
+          bindtap="goDetail"
+          bindlongpress="onCardLongPress"
+        >
+          <view class="card-cover cover-{{item.theme}}">
+            <text class="cover-emoji">📄</text>
+          </view>
+          <view class="card-body">
+            <text class="card-title line-clamp-2">{{item.title}}</text>
+            <view class="card-meta">
+              <text class="text-faint meta-author">{{item.author}}</text>
+              <text class="text-faint">♥ {{item.likes}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="waterfall-col">
+        <view
+          wx:for="{{rightCol}}"
+          wx:key="id"
+          class="card template-card"
+          data-id="{{item.id}}"
+          bindtap="goDetail"
+          bindlongpress="onCardLongPress"
+        >
+          <view class="card-cover cover-{{item.theme}}">
+            <text class="cover-emoji">📄</text>
+          </view>
+          <view class="card-body">
+            <text class="card-title line-clamp-2">{{item.title}}</text>
+            <view class="card-meta">
+              <text class="text-faint meta-author">{{item.author}}</text>
+              <text class="text-faint">♥ {{item.likes}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+  <view class="fab" bindtap="goCreate">
+    <text class="fab-icon">+</text>
+    <text>创作</text>
+  </view>
+</view>

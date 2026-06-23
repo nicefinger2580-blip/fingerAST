@@ -1,0 +1,78 @@
+.mt-3 { margin-top: 24rpx; }
+.preview-card { overflow: hidden; }
+.preview-inner {
+  min-height: 320rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  text-align: center;
+}
+.cover-blue { background: linear-gradient(135deg, #dbeafe, #fff); }
+.cover-teal { background: linear-gradient(135deg, #ccfbf1, #fff); }
+.cover-indigo { background: linear-gradient(135deg, #e0e7ff, #fff); }
+.cover-amber { background: linear-gradient(135deg, #fef3c7, #fff); }
+.preview-emoji { font-size: 80rpx; margin-bottom: 16rpx; }
+.preview-title { font-size: 24rpx; color: var(--muted); line-height: 1.5; }
+
+.author-card { padding: 32rpx; }
+.author-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.author-left { display: flex; gap: 16rpx; }
+.author-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: #22c55e;
+  color: #fff;
+  text-align: center;
+  line-height: 64rpx;
+  font-size: 24rpx;
+}
+.author-name { font-size: 28rpx; font-weight: 500; }
+.author-date { font-size: 20rpx; margin-top: 4rpx; }
+.author-actions { display: flex; gap: 32rpx; }
+.action-col { display: flex; flex-direction: column; align-items: center; font-size: 32rpx; }
+.action-num { font-size: 20rpx; margin-top: 4rpx; }
+.liked { color: var(--danger); }
+.desc { font-size: 28rpx; line-height: 1.6; margin-top: 24rpx; }
+
+.outline-section, .comments { padding: 32rpx; }
+.section-title { font-size: 28rpx; font-weight: 600; margin-bottom: 24rpx; }
+.outline-line { font-size: 28rpx; color: var(--muted); padding: 8rpx 0; }
+.level-1 { font-weight: 600; color: var(--ink); }
+.level-2 { padding-left: 32rpx; }
+
+.comment-item { display: flex; gap: 16rpx; margin-bottom: 24rpx; }
+.comment-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  background: #60a5fa;
+  color: #fff;
+  text-align: center;
+  line-height: 56rpx;
+  font-size: 20rpx;
+  flex-shrink: 0;
+}
+.comment-head { font-size: 24rpx; }
+.comment-author { font-weight: 500; }
+.comment-date { margin-left: 12rpx; }
+.comment-text { font-size: 24rpx; margin-top: 4rpx; line-height: 1.5; }
+
+.mb-bar { margin-bottom: 160rpx; }
+.detail-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #eef0f4;
+  display: flex;
+  gap: 24rpx;
+  z-index: 90;
+}
+.detail-bottom .btn-primary,
+.detail-bottom .btn-secondary { flex: 1; font-size: 28rpx; }

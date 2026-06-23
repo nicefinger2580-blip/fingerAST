@@ -1,0 +1,76 @@
+.mt-3 { margin-top: 24rpx; }
+.mt-4 { margin-top: 32rpx; }
+.mt-5 { margin-top: 40rpx; }
+
+.guide-card { padding: 32rpx; }
+.guide-row { display: flex; gap: 24rpx; align-items: flex-start; }
+.guide-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background: rgba(59, 124, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+.guide-title { font-size: 28rpx; font-weight: 600; }
+.guide-desc { font-size: 24rpx; margin-top: 8rpx; line-height: 1.5; }
+
+.label { font-size: 28rpx; font-weight: 500; margin-bottom: 16rpx; }
+.input-card { padding: 24rpx; position: relative; }
+.prompt-input {
+  width: 100%;
+  min-height: 240rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+.char-count {
+  position: absolute;
+  right: 24rpx;
+  bottom: 16rpx;
+  font-size: 24rpx;
+}
+
+.preset-label { font-size: 24rpx; margin-bottom: 16rpx; }
+.preset-row { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.preset-tag {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: var(--muted);
+  background: #fff;
+  border: 1rpx solid #e5e7eb;
+}
+
+.cost-tip { text-align: center; font-size: 24rpx; margin-top: 16rpx; }
+.empty-sub { font-size: 24rpx; margin-top: 8rpx; }
+
+.prompt-preview { padding: 24rpx; font-size: 24rpx; }
+.loading-title { font-size: 32rpx; font-weight: 500; margin-bottom: 16rpx; }
+.cancel-link { margin-top: 32rpx; text-decoration: underline; font-size: 28rpx; }
+
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.result-title { font-size: 28rpx; font-weight: 600; }
+.result-sub { font-size: 24rpx; margin-top: 4rpx; }
+.result-actions { display: flex; gap: 24rpx; flex-shrink: 0; }
+.action-btn { font-size: 24rpx; }
+
+.outline-card { padding: 32rpx; padding-bottom: 200rpx; }
+.outline-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+}
+.level-2 { padding-left: 40rpx; }
+.outline-l1 { font-weight: 600; color: var(--ink); }
+.outline-l2 { color: var(--muted); }
+
+.bottom-spacer { height: 160rpx; }

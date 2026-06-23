@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>资源</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body class="relative">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="flex items-center gap-2">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="#1A2332"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="5" y="2" width="3" height="10" rx="1"/><rect x="10" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#1A2332" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#1A2332"/></svg>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <span class="title">指尖论文</span>
+    <div class="capsule-wrap"><div class="wx-capsule"><span><svg width="18" height="6" viewBox="0 0 18 6"><circle cx="3" cy="3" r="2.5" fill="#1A2332"/><circle cx="9" cy="3" r="2.5" fill="#1A2332"/><circle cx="15" cy="3" r="2.5" fill="#1A2332"/></svg></span><div class="divider"></div><span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#1A2332" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2.5" fill="#1A2332"/></svg></span></div></div>
+  </div>
+
+  <div class="page-content bg-surface">
+    <!-- 三个 Tab -->
+    <div class="bleed-x bg-white pt-3 pb-0 sticky top-0 z-10">
+      <div class="flex border-b border-gray-100">
+        <div class="flex-1 text-center pb-2.5 border-b-2 border-primary">
+          <span class="text-sm font-semibold text-primary">开源素材</span>
+        </div>
+        <div class="flex-1 text-center pb-2.5">
+          <span class="text-sm text-muted">实用工具</span>
+        </div>
+        <div class="flex-1 text-center pb-2.5">
+          <span class="text-sm text-muted">编写教程</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 资源列表 -->
+    <div class="pt-3 pb-4 space-y-3">
+      <div class="card p-3 flex gap-3">
+        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center shrink-0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3B7CFF" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-ink truncate">LaTeX 论文模板合集</p>
+          <p class="text-xs text-muted mt-1 line-clamp-2">涵盖 IEEE、ACM、中文学位论文等多种格式模板</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-primary">免费</span>
+            <span class="text-[10px] text-faint">1.2k 下载</span>
+          </div>
+        </div>
+        <svg class="shrink-0 text-faint mt-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="card p-3 flex gap-3">
+        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-teal-50 to-cyan-50 flex items-center justify-center shrink-0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5BC0BE" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-ink truncate">学术图表素材库</p>
+          <p class="text-xs text-muted mt-1 line-clamp-2">高质量流程图、架构图、数据可视化素材</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-50 text-secondary">开源</span>
+            <span class="text-[10px] text-faint">856 下载</span>
+          </div>
+        </div>
+        <svg class="shrink-0 text-faint mt-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="card p-3 flex gap-3">
+        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center shrink-0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-ink truncate">参考文献格式规范手册</p>
+          <p class="text-xs text-muted mt-1 line-clamp-2">GB/T 7714、APA、MLA 等引用格式完整指南</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-indigo-500">文档</span>
+            <span class="text-[10px] text-faint">2.3k 阅读</span>
+          </div>
+        </div>
+        <svg class="shrink-0 text-faint mt-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="card p-3 flex gap-3">
+        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center shrink-0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-ink truncate">论文封面与扉页模板</p>
+          <p class="text-xs text-muted mt-1 line-clamp-2">各高校学位论文封面设计规范与模板下载</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-600">模板</span>
+            <span class="text-[10px] text-faint">645 下载</span>
+          </div>
+        </div>
+        <svg class="shrink-0 text-faint mt-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></div>
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>创作</span></div>
+    <div class="tab-item active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>资源</span></div>
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>我的</span></div>
+  </div>
+</body>
+</html>

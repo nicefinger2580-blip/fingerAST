@@ -1,0 +1,57 @@
+<view class="page page-pad" wx:if="{{template}}">
+  <view class="card preview-card mt-3">
+    <view class="preview-inner cover-{{template.theme}}">
+      <text class="preview-emoji">📄</text>
+      <text class="preview-title">{{template.title}}</text>
+    </view>
+  </view>
+
+  <view class="card author-card mt-3">
+    <view class="author-row">
+      <view class="author-left">
+        <view class="author-avatar">{{template.author[0]}}</view>
+        <view>
+          <view class="author-name">{{template.author}}</view>
+          <view class="text-faint author-date">发布于 {{template.createdAt}}</view>
+        </view>
+      </view>
+      <view class="author-actions">
+        <view class="action-col" bindtap="onLike">
+          <text class="{{liked ? 'liked' : ''}}">♥</text>
+          <text class="text-faint action-num">{{template.likes}}</text>
+        </view>
+        <view class="action-col" bindtap="onFavorite">
+          <text>🔖</text>
+          <text class="text-faint action-num">收藏</text>
+        </view>
+      </view>
+    </view>
+    <view class="desc text-muted">{{template.description || template.title}}</view>
+  </view>
+
+  <view class="card outline-section mt-3">
+    <view class="section-title">论文大纲</view>
+    <view wx:for="{{template.outline}}" wx:key="id" class="outline-line level-{{item.level}}">
+      {{item.title}}
+    </view>
+  </view>
+
+  <view class="card comments mt-3 mb-bar">
+    <view class="section-title">评论 ({{template.comments.length || 0}})</view>
+    <view wx:for="{{template.comments}}" wx:key="id" class="comment-item">
+      <view class="comment-avatar">{{item.author[0]}}</view>
+      <view>
+        <view class="comment-head">
+          <text class="comment-author">{{item.author}}</text>
+          <text class="text-faint comment-date">{{item.date}}</text>
+        </view>
+        <view class="text-muted comment-text">{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-bottom">
+    <button class="btn-secondary" bindtap="onUseTemplate">借鉴此模板</button>
+    <button class="btn-primary" bindtap="onExport">导出 docx</button>
+  </view>
+</view>

@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>我的</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body class="relative mine-page">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="flex items-center gap-2">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="#1A2332"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="5" y="2" width="3" height="10" rx="1"/><rect x="10" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#1A2332" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#1A2332"/></svg>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <span class="title">指尖论文</span>
+    <div class="capsule-wrap"><div class="wx-capsule"><span><svg width="18" height="6" viewBox="0 0 18 6"><circle cx="3" cy="3" r="2.5" fill="#1A2332"/><circle cx="9" cy="3" r="2.5" fill="#1A2332"/><circle cx="15" cy="3" r="2.5" fill="#1A2332"/></svg></span><div class="divider"></div><span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#1A2332" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2.5" fill="#1A2332"/></svg></span></div></div>
+  </div>
+
+  <div class="mine-body">
+    <!-- 已登录头部：独立于 page-content，全宽无不对称留白 -->
+    <div class="profile-header py-5 flex items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-lg font-bold">张</div>
+        <div>
+          <p class="text-base font-semibold text-ink">张同学</p>
+          <p class="text-xs text-faint mt-0.5">微信用户</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full shrink-0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FAAD14"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.8 5.7 21l2.3-7-6-4.6h7.6z"/></svg>
+        <span class="text-sm font-semibold text-amber-600">120</span>
+        <span class="text-xs text-amber-500">积分</span>
+      </div>
+    </div>
+
+    <div class="page-content bg-surface">
+    <div class="mt-4 grid grid-cols-3 gap-3">
+      <div class="card p-4 flex flex-col items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B7CFF" stroke-width="1.5"><path d="M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <span class="text-xs text-ink font-medium">创作历史</span>
+        <span class="text-[10px] text-faint">12 篇</span>
+      </div>
+      <div class="card p-4 flex flex-col items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FAAD14" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.8 5.7 21l2.3-7-6-4.6h7.6z"/></svg>
+        </div>
+        <span class="text-xs text-ink font-medium">积分明细</span>
+        <span class="text-[10px] text-faint">120 分</span>
+      </div>
+      <div class="card p-4 flex flex-col items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5BC0BE" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <span class="text-xs text-ink font-medium">每日签到</span>
+        <span class="text-[10px] text-secondary">已签 5 天</span>
+      </div>
+    </div>
+
+    <!-- 我的收藏 -->
+    <div class="mt-4 card">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+        <span class="text-sm font-medium text-ink">我的收藏</span>
+        <span class="text-xs text-faint">3 篇 →</span>
+      </div>
+      <div class="px-4 py-3 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B7CFF" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-ink truncate">深度学习在医学影像中的应用</p>
+          <p class="text-[10px] text-faint mt-0.5">收藏于 06-20</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设置区 -->
+    <div class="mt-4 card divide-y divide-gray-50">
+      <div class="flex items-center justify-between px-4 py-3.5">
+        <div class="flex items-center gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7A8F" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          <span class="text-sm text-ink">清除缓存</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0BEC5" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="flex items-center justify-between px-4 py-3.5">
+        <div class="flex items-center gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7A8F" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="text-sm text-ink">意见反馈</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0BEC5" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="flex items-center justify-between px-4 py-3.5">
+        <div class="flex items-center gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF4D4F" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="text-sm text-red-500">退出登录</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0BEC5" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></div>
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>创作</span></div>
+    <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>资源</span></div>
+    <div class="tab-item active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></div>
+  </div>
+</body>
+</html>

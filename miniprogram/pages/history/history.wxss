@@ -1,0 +1,33 @@
+.history-item { padding: 32rpx; margin-top: 24rpx; }
+.history-head { display: flex; justify-content: space-between; gap: 16rpx; }
+.history-main { flex: 1; min-width: 0; }
+.history-title { font-size: 28rpx; font-weight: 500; }
+.history-meta { font-size: 24rpx; margin-top: 8rpx; }
+.status-tag {
+  font-size: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  height: fit-content;
+  flex-shrink: 0;
+}
+.status-tag.done { background: rgba(82,196,26,0.1); color: var(--success); }
+.status-tag.shared { background: rgba(59,124,255,0.1); color: var(--primary); }
+
+.history-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #f9fafb;
+}
+.action-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  padding: 12rpx 0;
+  border-radius: 12rpx;
+  background: var(--surface);
+  color: var(--muted);
+}
+.action-btn.primary { background: rgba(59,124,255,0.08); color: var(--primary); font-weight: 500; }
+.action-btn.danger { background: rgba(255,77,79,0.08); color: var(--danger); }

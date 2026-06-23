@@ -1,0 +1,34 @@
+<view class="page">
+  <view class="tab-header bg-white">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="*this"
+      class="tab-item {{activeTab === index ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabTap"
+    >
+      <text>{{item}}</text>
+      <view wx:if="{{activeTab === index}}" class="tab-line"></view>
+    </view>
+  </view>
+
+  <view class="page-pad list-wrap">
+    <view
+      wx:for="{{list}}"
+      wx:key="id"
+      class="card resource-item"
+      bindtap="onItemTap"
+    >
+      <view class="res-icon res-{{item.tagColor}}">📁</view>
+      <view class="res-content">
+        <view class="res-title">{{item.title}}</view>
+        <view class="text-muted res-desc line-clamp-2">{{item.desc}}</view>
+        <view class="res-meta">
+          <text class="res-tag tag-{{item.tagColor}}">{{item.tag}}</text>
+          <text class="text-faint">{{item.count}}</text>
+        </view>
+      </view>
+      <text class="arrow text-faint">›</text>
+    </view>
+  </view>
+</view>

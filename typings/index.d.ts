@@ -2,7 +2,8 @@
 
 interface IAppOption {
   globalData: {
-    userInfo?: WechatMiniprogram.UserInfo,
+    user: import('./utils/types').UserProfile | null
+    createFocus: boolean
   }
-  userInfoReadyCallback?: WechatMiniprogram.GetUserInfoSuccessCallback,
+  syncUser: () => import('./utils/types').UserProfile | null
 }

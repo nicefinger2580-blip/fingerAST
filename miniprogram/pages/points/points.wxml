@@ -1,0 +1,42 @@
+<view class="page page-pad" wx:if="{{user}}">
+  <view class="points-card mt-4">
+    <view class="text-faint pc-label">当前积分余额</view>
+    <view class="pc-balance">
+      <text class="pc-num">{{user.points}}</text>
+      <text class="pc-unit">积分</text>
+    </view>
+    <view class="pc-stats">
+      <view>
+        <view class="pc-stat-num">+{{totalEarn}}</view>
+        <view class="text-faint pc-stat-label">累计获取</view>
+      </view>
+      <view>
+        <view class="pc-stat-num">-{{totalSpend}}</view>
+        <view class="text-faint pc-stat-label">累计消耗</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-switch mt-4">
+    <view class="switch-item {{tab === 0 ? 'active' : ''}}" data-index="0" bindtap="onTabTap">获取记录</view>
+    <view class="switch-item {{tab === 1 ? 'active' : ''}}" data-index="1" bindtap="onTabTap">消耗记录</view>
+  </view>
+
+  <view class="record-list">
+    <view wx:for="{{tab === 0 ? earnList : spendList}}" wx:key="id" class="card record-item">
+      <view class="record-left">
+        <view class="record-icon">{{tab === 0 ? '📅' : '📄'}}</view>
+        <view>
+          <view class="record-title">{{item.title}}</view>
+          <view class="text-faint record-time">{{item.time}}</view>
+        </view>
+      </view>
+      <text class="record-amount {{tab === 0 ? 'earn' : 'spend'}}">
+        {{tab === 0 ? '+' : '-'}}{{item.amount}}
+      </text>
+    </view>
+    <view wx:if="{{tab === 1 && spendList.length === 0}}" class="empty-state">
+      <text class="text-muted">暂无消耗记录</text>
+    </view>
+  </view>
+</view>

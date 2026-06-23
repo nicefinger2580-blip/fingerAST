@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>模板详情</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body class="relative">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="flex items-center gap-2">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="#1A2332"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="5" y="2" width="3" height="10" rx="1"/><rect x="10" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="#1A2332" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#1A2332"/></svg>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <span class="title">模板详情</span>
+    <div class="capsule-wrap"><div class="wx-capsule"><span><svg width="18" height="6" viewBox="0 0 18 6"><circle cx="3" cy="3" r="2.5" fill="#1A2332"/><circle cx="9" cy="3" r="2.5" fill="#1A2332"/><circle cx="15" cy="3" r="2.5" fill="#1A2332"/></svg></span><div class="divider"></div><span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#1A2332" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2.5" fill="#1A2332"/></svg></span></div></div>
+  </div>
+
+  <div class="page-content no-tab bg-surface" style="height: calc(904px - 54px - 44px - 60px);">
+    <!-- 预览图 -->
+    <div class="mt-3 card overflow-hidden">
+      <div class="h-44 bg-gradient-to-br from-blue-100 via-blue-50 to-white flex items-center justify-center">
+        <div class="text-center">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3B7CFF" stroke-width="1" class="mx-auto mb-2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          <p class="text-xs text-muted px-8">基于深度学习的图像识别在医学诊断中的应用研究</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 作者信息 -->
+    <div class="mt-3 card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold">学</div>
+          <div>
+            <p class="text-sm font-medium text-ink">学术小白</p>
+            <p class="text-[10px] text-faint">发布于 2025-06-18</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex flex-col items-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF4D4F" stroke="#FF4D4F" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+            <span class="text-[10px] text-faint mt-0.5">128</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0BEC5" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            <span class="text-[10px] text-faint mt-0.5">收藏</span>
+          </div>
+        </div>
+      </div>
+      <p class="text-sm text-ink leading-relaxed">基于深度学习的图像识别在医学诊断中的应用研究，涵盖 CNN、ResNet 等模型在 X 光、CT 影像分析中的实践。</p>
+    </div>
+
+    <!-- 大纲预览 -->
+    <div class="mt-3 card p-4">
+      <p class="text-sm font-semibold text-ink mb-3">论文大纲</p>
+      <div class="space-y-2 text-sm text-muted">
+        <p>1. 引言</p>
+        <p class="pl-4">1.1 研究背景与意义</p>
+        <p class="pl-4">1.2 国内外研究现状</p>
+        <p>2. 相关理论与技术</p>
+        <p class="pl-4">2.1 深度学习基础</p>
+        <p class="pl-4">2.2 医学影像处理技术</p>
+        <p>3. 模型设计与实现</p>
+        <p>4. 实验结果与分析</p>
+        <p>5. 结论与展望</p>
+      </div>
+    </div>
+
+    <!-- 评论区 -->
+    <div class="mt-3 mb-4 card p-4">
+      <p class="text-sm font-semibold text-ink mb-3">评论 (3)</p>
+      <div class="space-y-3">
+        <div class="flex gap-2">
+          <div class="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-white text-[10px] shrink-0">李</div>
+          <div>
+            <p class="text-xs font-medium text-ink">李研究 <span class="text-faint font-normal">06-19</span></p>
+            <p class="text-xs text-muted mt-0.5">结构很清晰，对我写综述很有帮助！</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-7 h-7 rounded-full bg-purple-400 flex items-center justify-center text-white text-[10px] shrink-0">王</div>
+          <div>
+            <p class="text-xs font-medium text-ink">王同学 <span class="text-faint font-normal">06-20</span></p>
+            <p class="text-xs text-muted mt-0.5">第三章的模型设计部分可以再细化一下</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部操作 -->
+  <div class="bottom-bar bottom-0 bg-white border-t border-gray-100 py-3 flex gap-3 z-20" style="padding-bottom: 28px;">
+    <button class="btn-secondary flex-1 text-sm">借鉴此模板</button>
+    <button class="btn-primary flex-1 text-sm">导出 docx</button>
+  </div>
+</body>
+</html>

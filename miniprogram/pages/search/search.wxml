@@ -1,0 +1,55 @@
+<view class="page">
+  <view class="search-bar bg-white page-pad">
+    <view class="search-input-wrap">
+      <text class="si-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索论文模板或提示词"
+        value="{{keyword}}"
+        bindinput="onInput"
+        bindconfirm="onSearch"
+        focus
+      />
+      <text wx:if="{{keyword}}" class="clear-btn" bindtap="onClear">×</text>
+    </view>
+  </view>
+
+  <view class="page-pad">
+    <view wx:if="{{history.length && !searched}}" class="history-section">
+      <view class="history-head">
+        <text class="history-title">搜索历史</text>
+        <text class="text-faint" bindtap="onClearHistory">清除</text>
+      </view>
+      <view class="history-tags">
+        <view
+          wx:for="{{history}}"
+          wx:key="*this"
+          class="history-tag"
+          data-kw="{{item}}"
+          bindtap="onHistoryTap"
+        >{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{searched}}">
+      <view class="text-faint result-count">找到 {{results.length}} 个相关模板</view>
+      <view
+        wx:for="{{results}}"
+        wx:key="id"
+        class="card result-item"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <view class="result-icon">📄</view>
+        <view class="result-body">
+          <view class="result-title line-clamp-2">{{item.title}}</view>
+          <view class="result-meta text-faint">
+            <text>{{item.author}}</text>
+            <text>·</text>
+            <text>{{item.likes}} 赞</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

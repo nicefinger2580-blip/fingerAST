@@ -1,0 +1,109 @@
+<view class="page mine-page">
+  <!-- 未登录 -->
+  <block wx:if="{{!loggedIn}}">
+    <view class="profile-header" bindtap="onLoginTap">
+      <view class="avatar avatar-guest">👤</view>
+      <view>
+        <view class="name text-primary">点击登录</view>
+        <view class="text-faint sub">登录后体验完整功能</view>
+      </view>
+    </view>
+
+    <view class="page-pad">
+      <view class="grid-3 mt-4">
+        <view class="card grid-item dim" data-type="history" bindtap="onGridTap">
+          <view class="grid-icon blue">🕐</view>
+          <text class="grid-label">创作历史</text>
+        </view>
+        <view class="card grid-item dim" data-type="points" bindtap="onGridTap">
+          <view class="grid-icon amber">★</view>
+          <text class="grid-label">积分余额</text>
+        </view>
+        <view class="card grid-item dim" data-type="signin" bindtap="onGridTap">
+          <view class="grid-icon teal">📅</view>
+          <text class="grid-label">每日签到</text>
+        </view>
+      </view>
+
+      <view class="card login-modal mt-8">
+        <view class="modal-icon">!</view>
+        <view class="modal-title">请先登录以使用该功能</view>
+        <view class="text-muted modal-desc">登录后可使用创作、签到、导出等完整功能</view>
+        <button class="btn-primary mt-4" bindtap="onLoginTap">微信一键登录</button>
+      </view>
+
+      <view class="footer-links">
+        <text class="text-faint link">隐私政策</text>
+        <text class="text-faint link">用户协议</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 已登录 -->
+  <block wx:else>
+    <view class="profile-header profile-row">
+      <view class="user-row" bindtap="onLoginTap">
+        <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-user">{{user.nickName[0]}}</view>
+        <view>
+          <view class="name">{{user.nickName}}</view>
+          <view class="text-faint sub">微信用户</view>
+        </view>
+      </view>
+      <view class="points-badge" bindtap="onPointsTap">
+        <text class="star">★</text>
+        <text class="points-num">{{user.points}}</text>
+        <text class="points-label">积分</text>
+      </view>
+    </view>
+
+    <view class="page-pad scroll-body">
+      <view class="grid-3 mt-4">
+        <view class="card grid-item" data-type="history" bindtap="onGridTap">
+          <view class="grid-icon blue">🕐</view>
+          <text class="grid-label">创作历史</text>
+          <text class="text-faint grid-sub">{{historyCount}} 篇</text>
+        </view>
+        <view class="card grid-item" data-type="points" bindtap="onGridTap">
+          <view class="grid-icon amber">★</view>
+          <text class="grid-label">积分明细</text>
+          <text class="text-faint grid-sub">{{user.points}} 分</text>
+        </view>
+        <view class="card grid-item" data-type="signin" bindtap="onGridTap">
+          <view class="grid-icon teal">📅</view>
+          <text class="grid-label">每日签到</text>
+          <text class="text-secondary grid-sub">已签 {{user.signedDays}} 天</text>
+        </view>
+      </view>
+
+      <view class="card fav-card mt-4">
+        <view class="fav-head">
+          <text class="fav-title">我的收藏</text>
+          <text class="text-faint">3 篇 →</text>
+        </view>
+        <view class="fav-item">
+          <view class="fav-icon">📄</view>
+          <view>
+            <view class="fav-name">{{favoritePreview}}</view>
+            <view class="text-faint fav-date">收藏于 06-20</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="card settings mt-4">
+        <view class="setting-item" bindtap="onClearCache">
+          <text>清除缓存</text>
+          <text class="text-faint">›</text>
+        </view>
+        <view class="setting-item" bindtap="onFeedback">
+          <text>意见反馈</text>
+          <text class="text-faint">›</text>
+        </view>
+        <view class="setting-item" bindtap="onLogout">
+          <text class="text-danger">退出登录</text>
+          <text class="text-faint">›</text>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

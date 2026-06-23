@@ -1,0 +1,243 @@
+/* 指尖论文 · 小程序原型共享样式 */
+:root {
+  --page-padding-x: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 904px;
+  max-width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #F5F7FA;
+  color: #1A2332;
+}
+
+/* 状态栏 */
+.status-bar {
+  height: 54px;
+  padding: 14px var(--page-padding-x) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  position: relative;
+  z-index: 20;
+  width: 100%;
+}
+.status-bar .time { font-size: 15px; font-weight: 600; }
+.status-bar .icons { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+
+/* 微信胶囊按钮 */
+.wx-capsule {
+  display: flex;
+  align-items: center;
+  border: 0.5px solid rgba(0,0,0,0.15);
+  border-radius: 16px;
+  height: 32px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+.wx-capsule span {
+  width: 43px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wx-capsule .divider { width: 0.5px; height: 18px; background: rgba(0,0,0,0.15); }
+
+/* 自定义导航栏 */
+.nav-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  position: relative;
+  border-bottom: 0.5px solid #EEF0F4;
+  width: 100%;
+}
+.nav-bar .title { font-size: 17px; font-weight: 600; }
+.nav-bar .back {
+  position: absolute;
+  left: var(--page-padding-x);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #1A2332;
+  font-size: 14px;
+}
+.nav-bar .capsule-wrap {
+  position: absolute;
+  right: var(--page-padding-x);
+  display: flex;
+  align-items: center;
+}
+
+/* 底部 Tab */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 83px;
+  background: #fff;
+  border-top: 0.5px solid #EEF0F4;
+  display: flex;
+  padding-bottom: 28px;
+  z-index: 30;
+  width: 100%;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #B0BEC5;
+  min-width: 0;
+}
+.tab-item.active { color: #3B7CFF; }
+.tab-item svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+/* 页面内容区 */
+.page-content {
+  height: calc(904px - 54px - 44px - 83px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  padding-left: var(--page-padding-x);
+  padding-right: var(--page-padding-x);
+}
+.page-content.no-tab {
+  height: calc(904px - 54px - 44px);
+}
+.page-content.no-nav {
+  height: calc(904px - 54px - 83px);
+}
+
+/* 全宽背景区块：内容仍保持与页面一致的左右留白 */
+.page-content > .bleed-x {
+  margin-inline: calc(-1 * var(--page-padding-x));
+  padding-inline: var(--page-padding-x);
+  max-width: none;
+}
+
+/* 「我的」页：顶部用户信息区（独立于 page-content，天然全宽） */
+.profile-header {
+  width: 100%;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+/* 「我的」页：中间可滚动区域 */
+.mine-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.mine-page .mine-body {
+  flex: 1;
+  min-height: 0;
+  height: calc(100% - 54px - 44px - 83px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.mine-page .page-content {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  max-width: 100%;
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: #3B7CFF;
+  color: #fff;
+  border-radius: 8px;
+  height: 44px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 100%;
+  max-width: 100%;
+}
+.btn-secondary {
+  background: #fff;
+  color: #3B7CFF;
+  border: 1px solid #3B7CFF;
+  border-radius: 8px;
+  height: 44px;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 底部固定操作栏 */
+.bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-left: var(--page-padding-x);
+  padding-right: var(--page-padding-x);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* 悬浮按钮 */
+.fab {
+  position: absolute;
+  right: var(--page-padding-x);
+  bottom: 99px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: #3B7CFF;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  box-shadow: 0 4px 16px rgba(59,124,255,0.4);
+  z-index: 25;
+  line-height: 1.2;
+}
+
+/* 防止 flex/grid 子项溢出（排除需全宽贴边的区块） */
+.page-content .grid,
+.page-content .flex:not(.bleed-x) {
+  max-width: 100%;
+}
+.page-content .grid > *,
+.page-content .flex > * {
+  min-width: 0;
+}
+
+/* 滚动条隐藏 */
+.page-content::-webkit-scrollbar { display: none; }

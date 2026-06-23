@@ -1,0 +1,43 @@
+<view class="page page-pad">
+  <view class="card stats-card mt-4">
+    <view class="text-muted">已连续签到</view>
+    <view class="stats-num">
+      <text class="num">{{signedDays}}</text>
+      <text class="unit">天</text>
+    </view>
+    <view class="text-faint stats-tip">连续签到 7 天额外奖励 +20 积分</view>
+  </view>
+
+  <view class="card calendar-card mt-4">
+    <view class="cal-head">
+      <text class="cal-title">{{year}} 年 {{month}} 月</text>
+    </view>
+    <view class="week-row">
+      <text wx:for="{{weekdays}}" wx:key="*this" class="week-cell">{{item}}</text>
+    </view>
+    <view class="day-grid">
+      <view
+        wx:for="{{calendar}}"
+        wx:key="index"
+        class="day-cell {{item.empty ? 'empty' : ''}} {{item.signed ? 'signed' : ''}} {{item.today ? 'today' : ''}}"
+      >
+        <text wx:if="{{!item.empty}}">{{item.day}}</text>
+        <view wx:if="{{item.signed && !item.empty}}" class="signed-dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn-primary mt-5" bindtap="onSignin" disabled="{{signedToday}}">
+    {{signedToday ? '已签到' : '签到 +' + reward + ' 积分'}}
+  </button>
+
+  <view wx:if="{{showToast}}" class="toast-success">✓ 签到成功，获得 {{reward}} 积分</view>
+
+  <view class="card rules mt-5">
+    <view class="rules-title">签到规则</view>
+    <view class="rule-line text-muted">· 每日签到可获得 {{reward}} 积分</view>
+    <view class="rule-line text-muted">· 连续签到 7 天额外奖励 20 积分</view>
+    <view class="rule-line text-muted">· 积分可用于 AI 生成和 docx 导出</view>
+    <view class="rule-line text-muted">· 每日仅可签到一次，不可补签</view>
+  </view>
+</view>
