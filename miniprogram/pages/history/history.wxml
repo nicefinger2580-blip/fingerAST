@@ -1,27 +1,33 @@
 <view class="page page-pad">
-  <view wx:if="{{list.length === 0}}" class="empty-state">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <view wx:elif="{{list.length === 0}}" class="empty-state">
     <view class="empty-icon">📄</view>
     <text class="text-muted">暂无模板，去创作第一篇吧</text>
   </view>
 
-  <view
-    wx:for="{{list}}"
-    wx:key="id"
-    class="card history-item"
-  >
-    <view class="history-head">
-      <view class="history-main">
-        <view class="history-title line-clamp-2">{{item.title}}</view>
-        <view class="text-faint history-meta">{{item.createdAt}} · {{item.sectionCount}} 章节</view>
+  <block wx:else>
+    <view
+      wx:for="{{list}}"
+      wx:key="id"
+      class="card history-item"
+    >
+      <view class="history-head">
+        <view class="history-main">
+          <view class="history-title line-clamp-2">{{item.title}}</view>
+          <view class="text-faint history-meta">{{item.createdAt}} · {{item.sectionCount}} 章节</view>
+        </view>
+        <view class="status-tag {{item.status === 'shared' ? 'shared' : 'done'}}">
+          {{item.status === 'shared' ? '已分享' : '已生成'}}
+        </view>
       </view>
-      <view class="status-tag {{item.status === 'shared' ? 'shared' : 'done'}}">
-        {{item.status === 'shared' ? '已分享' : '已生成'}}
+      <view class="history-actions">
+        <view class="action-btn primary" data-id="{{item.id}}" bindtap="onView">查看</view>
+        <view class="action-btn" bindtap="onRegenerate">重新生成</view>
+        <view class="action-btn danger" data-id="{{item.id}}" bindtap="onDelete">删除</view>
       </view>
     </view>
-    <view class="history-actions">
-      <view class="action-btn primary" data-id="{{item.id}}" bindtap="onView">查看</view>
-      <view class="action-btn" bindtap="onRegenerate">重新生成</view>
-      <view class="action-btn danger" data-id="{{item.id}}" bindtap="onDelete">删除</view>
-    </view>
-  </view>
+  </block>
 </view>

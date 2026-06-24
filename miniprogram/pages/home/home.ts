@@ -1,49 +1,65 @@
 import { FILTER_TABS } from '../../utils/constants'
-import { MOCK_TEMPLATES } from '../../utils/mock'
+import { callCloud } from '../../utils/cloud'
 import { requireLogin } from '../../utils/auth'
+import type { TemplateItem } from '../../utils/types'
+
+const SORT_MAP = ['latest', 'hot', 'mine'] as const
 
 Page({
   data: {
     filters: FILTER_TABS as unknown as string[],
     activeFilter: 0,
-    templates: MOCK_TEMPLATES,
-    leftCol: [] as typeof MOCK_TEMPLATES,
-    rightCol: [] as typeof MOCK_TEMPLATES,
-    loading: false,
+    templates: [] as TemplateItem[],
+    leftCol: [] as TemplateItem[],
+    rightCol: [] as TemplateItem[],
+    loading: true,
   },
 
   onLoad() {
-    this.splitWaterfall(MOCK_TEMPLATES)
+    this.loadTemplates()
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 })
     }
+    this.loadTemplates()
   },
 
-  splitWaterfall(list: typeof MOCK_TEMPLATES) {
-    const left: typeof MOCK_TEMPLATES = []
-    const right: typeof MOCK_TEMPLATES = []
+  splitWaterfall(list: TemplateItem[]) {
+    const left: TemplateItem[] = []
+    const right: TemplateItem[] = []
     list.forEach((item, i) => (i % 2 === 0 ? left : right).push(item))
     this.setData({ templates: list, leftCol: left, rightCol: right })
   },
 
-  onPullDownRefresh() {
+  async loadTemplates() {
+    const sort = SORT_MAP[this.data.activeFilter] || 'latest'
     this.setData({ loading: true })
-    setTimeout(() => {
-      this.splitWaterfall(MOCK_TEMPLATES)
+    try {
+      const data = await callCloud<{ list: TemplateItem[] }>('exhibit', {
+        action: 'list',
+        sort,
+      })
+      this.splitWaterfall(data.list)
       this.setData({ loading: false })
-      wx.stopPullDownRefresh()
-    }, 800)
+    } catch (err) {
+      this.setData({ loading: false })
+      wx.showToast({
+        title: err instanceof Error ? err.message : '加载失败',
+        icon: 'none',
+      })
+    }
+  },
+
+  onPullDownRefresh() {
+    this.loadTemplates().finally(() => wx.stopPullDownRefresh())
   },
 
   onFilterTap(e: WechatMiniprogram.TouchEvent) {
     const index = Number(e.currentTarget.dataset.index)
-    this.setData({ activeFilter: index })
-    let list = [...MOCK_TEMPLATES]
-    if (index === 1) list.sort((a, b) => b.likes - a.likes)
-    this.splitWaterfall(list)
+    if (index === 2 && !requireLogin()) return
+    this.setData({ activeFilter: index }, () => this.loadTemplates())
   },
 
   goSearch() {
@@ -52,7 +68,7 @@ Page({
 
   goDetail(e: WechatMiniprogram.TouchEvent) {
     const id = e.currentTarget.dataset.id as string
-    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
+    wx.navigateTo({ url: `/pages/detail/detail?id=${id}&type=exhibit` })
   },
 
   onCardLongPress(e: WechatMiniprogram.TouchEvent) {

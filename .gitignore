@@ -1,0 +1,4 @@
+.env
+node_modules/
+cloudfunctions/**/node_modules/
+miniprogram_npm/

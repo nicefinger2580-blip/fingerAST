@@ -1,7 +1,7 @@
-import { COST, PROMPT_PRESETS } from '../../utils/constants'
-import { generateOutline } from '../../utils/mock'
-import { getUser, requireLogin, updatePoints } from '../../utils/auth'
-import type { OutlineNode } from '../../utils/types'
+import { COST, PROMPT_PRESETS, PROMPT_HINT, MAX_PROMPT_LEN } from '../../utils/constants'
+import { getUser, requireLogin, saveUser } from '../../utils/auth'
+import { callCloud, downloadAndOpenDocx } from '../../utils/cloud'
+import type { OutlineNode, UserProfile } from '../../utils/types'
 
 type PageStatus = 'input' | 'loading' | 'result'
 
@@ -10,13 +10,17 @@ Page({
     status: 'input' as PageStatus,
     prompt: '',
     charCount: 0,
-    maxLen: 500,
+    maxLen: MAX_PROMPT_LEN,
+    promptHint: PROMPT_HINT,
     presets: Object.keys(PROMPT_PRESETS),
+    paperTitle: '',
     outline: [] as OutlineNode[],
+    paperId: '',
+    shared: false,
     expandAll: true,
     costGenerate: COST.generate,
     costExport: COST.exportDocx,
-    generateTimer: 0 as number | ReturnType<typeof setTimeout>,
+    generating: false,
   },
 
   onShow() {
@@ -29,18 +33,8 @@ Page({
     }
   },
 
-  onUnload() {
-    this.clearGenerateTimer()
-  },
-
-  clearGenerateTimer() {
-    if (this.data.generateTimer) {
-      clearTimeout(this.data.generateTimer as ReturnType<typeof setTimeout>)
-    }
-  },
-
   onPromptInput(e: WechatMiniprogram.Input) {
-    const val = (e.detail.value || '').slice(0, 500)
+    const val = (e.detail.value || '').slice(0, MAX_PROMPT_LEN)
     this.setData({ prompt: val, charCount: val.length })
   },
 
@@ -50,9 +44,10 @@ Page({
     this.setData({ prompt: val, charCount: val.length })
   },
 
-  onGenerate() {
+  async onGenerate() {
     if (!requireLogin()) return
-    const { prompt } = this.data
+    const { prompt, generating } = this.data
+    if (generating) return
     if (!prompt.trim()) {
       wx.showToast({ title: '请输入提示词', icon: 'none' })
       return
@@ -70,20 +65,52 @@ Page({
       })
       return
     }
-    updatePoints(-COST.generate)
-    this.setData({ status: 'loading' })
-    const timer = setTimeout(() => {
-      const outline = generateOutline(prompt)
-      this.setData({ status: 'result', outline, generateTimer: 0 })
-    }, 3000)
-    this.setData({ generateTimer: timer as unknown as number })
+
+    this.setData({ status: 'loading', generating: true })
+    try {
+      const data = await callCloud<{
+        paperId: string
+        prompt: string
+        title: string
+        outline: OutlineNode[]
+        user: UserProfile
+      }>('generatePaper', { prompt: prompt.trim() }, { slow: true })
+
+      saveUser(data.user)
+      getApp<IAppOption>().globalData.user = data.user
+      this.setData({
+        status: 'result',
+        paperTitle: data.title,
+        outline: data.outline,
+        paperId: data.paperId,
+        shared: false,
+        generating: false,
+      })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '生成失败'
+      this.setData({ status: 'input', generating: false })
+      if (msg.includes('积分不足')) {
+        wx.showModal({
+          title: '积分不足',
+          content: msg,
+          confirmText: '去签到',
+          confirmColor: '#3B7CFF',
+          success(res) {
+            if (res.confirm) wx.navigateTo({ url: '/pages/signin/signin' })
+          },
+        })
+      } else {
+        wx.showToast({ title: msg, icon: 'none', duration: 2500 })
+      }
+    }
   },
 
   onCancelGenerate() {
-    this.clearGenerateTimer()
-    updatePoints(COST.generate)
-    this.setData({ status: 'input', generateTimer: 0 })
-    wx.showToast({ title: '已取消生成', icon: 'none' })
+    if (!this.data.generating) {
+      this.setData({ status: 'input' })
+    } else {
+      wx.showToast({ title: '生成进行中，请稍候', icon: 'none' })
+    }
   },
 
   onRegenerate() {
@@ -93,7 +120,7 @@ Page({
       confirmColor: '#3B7CFF',
       success: (res) => {
         if (res.confirm) {
-          this.setData({ status: 'input', outline: [] })
+          this.setData({ outline: [], paperId: '', paperTitle: '', shared: false })
           this.onGenerate()
         }
       },
@@ -113,8 +140,9 @@ Page({
     this.setData({ outline })
   },
 
-  onExportDocx() {
+  async onExportDocx() {
     if (!requireLogin()) return
+    const { paperId, prompt, outline, paperTitle } = this.data
     const user = getUser()
     if (!user || user.points < COST.exportDocx) {
       wx.showModal({
@@ -132,10 +160,27 @@ Page({
       title: '确认导出',
       content: '将消耗 30 积分导出文档，是否继续？',
       confirmColor: '#3B7CFF',
-      success: (res) => {
-        if (res.confirm) {
-          updatePoints(-COST.exportDocx)
+      success: async (res) => {
+        if (!res.confirm) return
+        wx.showLoading({ title: '正在生成文档...' })
+        try {
+          const data = await callCloud<{ fileID: string; user: UserProfile }>('exportDocx', {
+            paperId,
+            prompt,
+            title: paperTitle || prompt.slice(0, 80),
+            outline,
+          }, { slow: true })
+          saveUser(data.user)
+          wx.hideLoading()
+          await downloadAndOpenDocx(data.fileID)
           wx.showToast({ title: '导出成功', icon: 'success' })
+        } catch (err) {
+          wx.hideLoading()
+          wx.showToast({
+            title: err instanceof Error ? err.message : '导出失败',
+            icon: 'none',
+            duration: 2500,
+          })
         }
       },
     })
@@ -143,14 +188,40 @@ Page({
 
   onShareExhibit() {
     if (!requireLogin()) return
+    const { paperId, shared } = this.data
+    if (!paperId) {
+      wx.showToast({ title: '请先生成论文', icon: 'none' })
+      return
+    }
+    if (shared) {
+      wx.showToast({ title: '已分享到展览', icon: 'none' })
+      return
+    }
     wx.showModal({
       title: '分享到展览',
-      content: '确认将模板发布至首页广场？',
+      content: '确认将论文发布至首页展厅？所有用户均可浏览、评论与导出。',
       confirmColor: '#3B7CFF',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showToast({ title: '分享成功', icon: 'success' })
+      success: async (res) => {
+        if (!res.confirm) return
+        wx.showLoading({ title: '发布中...' })
+        try {
+          const data = await callCloud<{
+            paperId: string
+            alreadyShared?: boolean
+          }>('exhibit', { action: 'share', paperId })
+          wx.hideLoading()
+          this.setData({ shared: true })
+          wx.showToast({
+            title: data.alreadyShared ? '已在展厅展示' : '分享成功',
+            icon: 'success',
+          })
           setTimeout(() => wx.switchTab({ url: '/pages/home/home' }), 1200)
+        } catch (err) {
+          wx.hideLoading()
+          wx.showToast({
+            title: err instanceof Error ? err.message : '分享失败',
+            icon: 'none',
+          })
         }
       },
     })

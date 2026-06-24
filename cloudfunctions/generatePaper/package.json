@@ -1,0 +1,9 @@
+{
+  "name": "generatePaper",
+  "version": "1.0.0",
+  "description": "AI 论文大纲生成",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

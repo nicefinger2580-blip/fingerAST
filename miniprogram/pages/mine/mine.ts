@@ -1,13 +1,13 @@
-import { getUser, isLoggedIn, login, logout, requireLogin, clearCache } from '../../utils/auth'
-import { MOCK_HISTORY } from '../../utils/mock'
+import { getUser, logout, requireLogin, clearCache, cloudLogin, fetchProfile } from '../../utils/auth'
 import type { UserProfile } from '../../utils/types'
 
 Page({
   data: {
     loggedIn: false,
     user: null as UserProfile | null,
-    historyCount: MOCK_HISTORY.length,
+    historyCount: 0,
     favoritePreview: '深度学习在医学影像中的应用',
+    loggingIn: false,
   },
 
   onShow() {
@@ -17,35 +17,55 @@ Page({
     this.refreshUser()
   },
 
-  refreshUser() {
-    const user = getUser()
-    const app = getApp<IAppOption>()
-    app.globalData.user = user
+  async refreshUser() {
+    const local = getUser()
+    if (local?.openid) {
+      const remote = await fetchProfile()
+      const user = remote || local
+      getApp<IAppOption>().globalData.user = user
+      this.setData({
+        loggedIn: true,
+        user,
+        historyCount: user.historyCount ?? 0,
+      })
+      return
+    }
+    getApp<IAppOption>().globalData.user = null
     this.setData({
-      loggedIn: !!user,
-      user,
-      historyCount: user?.historyCount ?? MOCK_HISTORY.length,
+      loggedIn: false,
+      user: null,
+      historyCount: 0,
     })
   },
 
-  onLoginTap() {
-    if (isLoggedIn()) return
+  async onLoginTap() {
+    if (this.data.loggingIn) return
+    if (getUser()?.openid) return
+
+    this.setData({ loggingIn: true })
+    wx.showLoading({ title: '登录中...' })
+
+    const doLogin = async (nickName: string, avatarUrl: string) => {
+      try {
+        const user = await cloudLogin(nickName, avatarUrl)
+        getApp<IAppOption>().globalData.user = user
+        this.setData({ loggedIn: true, user, historyCount: user.historyCount ?? 0 })
+        wx.showToast({ title: '登录成功', icon: 'success' })
+      } catch (err) {
+        wx.showToast({
+          title: err instanceof Error ? err.message : '登录失败',
+          icon: 'none',
+        })
+      } finally {
+        wx.hideLoading()
+        this.setData({ loggingIn: false })
+      }
+    }
+
     wx.getUserProfile({
       desc: '用于完善会员资料',
-      success: (res) => {
-        login(res.userInfo)
-        this.refreshUser()
-        wx.showToast({ title: '登录成功', icon: 'success' })
-      },
-      fail: () => {
-        const mockUser = login({
-          nickName: '张同学',
-          avatarUrl: '',
-        } as WechatMiniprogram.UserInfo)
-        this.refreshUser()
-        wx.showToast({ title: '登录成功', icon: 'success' })
-        console.log(mockUser)
-      },
+      success: (res) => doLogin(res.userInfo.nickName, res.userInfo.avatarUrl),
+      fail: () => doLogin('微信用户', ''),
     })
   },
 
@@ -63,11 +83,6 @@ Page({
   onPointsTap() {
     if (!requireLogin()) return
     wx.navigateTo({ url: '/pages/points/points' })
-  },
-
-  goHistory() {
-    if (!requireLogin()) return
-    wx.navigateTo({ url: '/pages/history/history' })
   },
 
   onClearCache() {

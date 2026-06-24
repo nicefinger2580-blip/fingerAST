@@ -1,4 +1,6 @@
 export interface UserProfile {
+  _id?: string
+  openid?: string
   nickName: string
   avatarUrl: string
   points: number
@@ -14,8 +16,9 @@ export interface TemplateItem {
   likes: number
   createdAt: string
   theme: string
-  outline?: OutlineNode[]
   description?: string
+  sectionCount?: number
+  outline?: OutlineNode[]
   comments?: CommentItem[]
 }
 
@@ -30,6 +33,7 @@ export interface OutlineNode {
   id: string
   title: string
   level: number
+  content?: string
   checked: boolean
   children?: OutlineNode[]
 }

@@ -1,5 +1,5 @@
 import { COST } from '../../utils/constants'
-import { getUser, hasSignedToday, saveUser, todayStr } from '../../utils/auth'
+import { getUser, hasSignedToday, cloudSignin } from '../../utils/auth'
 
 interface CalendarDay {
   day: number
@@ -18,6 +18,7 @@ Page({
     calendar: [] as CalendarDay[],
     reward: COST.signinReward,
     showToast: false,
+    signing: false,
   },
 
   onShow() {
@@ -43,7 +44,7 @@ Page({
   buildCalendar(year: number, month: number, signedDates: string[]): CalendarDay[] {
     const firstDay = new Date(year, month - 1, 1).getDay()
     const daysInMonth = new Date(year, month, 0).getDate()
-    const today = todayStr()
+    const today = `${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
     const cells: CalendarDay[] = []
     for (let i = 0; i < firstDay; i++) cells.push({ day: 0, signed: false, today: false, empty: true })
     for (let d = 1; d <= daysInMonth; d++) {
@@ -57,9 +58,10 @@ Page({
     return cells
   },
 
-  onSignin() {
+  async onSignin() {
+    if (this.data.signing) return
     const user = getUser()
-    if (!user) {
+    if (!user?.openid) {
       wx.showToast({ title: '请先登录', icon: 'none' })
       return
     }
@@ -67,13 +69,21 @@ Page({
       wx.showToast({ title: '今日已签到', icon: 'none' })
       return
     }
-    const today = todayStr()
-    user.points += COST.signinReward
-    user.signedDays += 1
-    user.signedDates = [...user.signedDates, today]
-    saveUser(user)
-    this.setData({ showToast: true, signedToday: true })
-    this.refresh()
-    setTimeout(() => this.setData({ showToast: false }), 2000)
+
+    this.setData({ signing: true })
+    try {
+      const { user: updated, reward } = await cloudSignin()
+      getApp<IAppOption>().globalData.user = updated
+      this.setData({ showToast: true, signedToday: true, signing: false })
+      this.refresh()
+      setTimeout(() => this.setData({ showToast: false }), 2000)
+      console.log('signin reward', reward)
+    } catch (err) {
+      this.setData({ signing: false })
+      wx.showToast({
+        title: err instanceof Error ? err.message : '签到失败',
+        icon: 'none',
+      })
+    }
   },
 })

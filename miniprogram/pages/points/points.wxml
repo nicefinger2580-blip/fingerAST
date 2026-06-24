@@ -1,4 +1,9 @@
 <view class="page page-pad" wx:if="{{user}}">
+  <view wx:if="{{loading}}" class="empty-state mt-4">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <block wx:else>
   <view class="points-card mt-4">
     <view class="text-faint pc-label">当前积分余额</view>
     <view class="pc-balance">
@@ -38,5 +43,9 @@
     <view wx:if="{{tab === 1 && spendList.length === 0}}" class="empty-state">
       <text class="text-muted">暂无消耗记录</text>
     </view>
+    <view wx:if="{{tab === 0 && earnList.length === 0}}" class="empty-state">
+      <text class="text-muted">暂无获取记录</text>
+    </view>
   </view>
+  </block>
 </view>

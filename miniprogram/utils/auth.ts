@@ -1,5 +1,6 @@
 import { COST } from './constants'
 import type { UserProfile } from './types'
+import { callCloud } from './cloud'
 
 const USER_KEY = 'finger_user'
 const SEARCH_HISTORY_KEY = 'finger_search_history'
@@ -14,37 +15,48 @@ export function getUser(): UserProfile | null {
 }
 
 export function isLoggedIn(): boolean {
-  return !!getUser()
+  return !!getUser()?.openid
 }
 
 export function saveUser(user: UserProfile): void {
   wx.setStorageSync(USER_KEY, user)
 }
 
-export function login(userInfo: WechatMiniprogram.UserInfo): UserProfile {
-  const existing = getUser()
-  const user: UserProfile = {
-    nickName: userInfo.nickName || '微信用户',
-    avatarUrl: userInfo.avatarUrl || '',
-    points: existing?.points ?? COST.registerReward,
-    signedDays: existing?.signedDays ?? 0,
-    signedDates: existing?.signedDates ?? [],
-    historyCount: existing?.historyCount ?? 0,
-  }
-  saveUser(user)
-  return user
-}
-
 export function logout(): void {
   wx.removeStorageSync(USER_KEY)
 }
 
-export function updatePoints(delta: number): UserProfile | null {
-  const user = getUser()
-  if (!user) return null
-  user.points = Math.max(0, user.points + delta)
+export async function cloudLogin(nickName: string, avatarUrl: string): Promise<UserProfile> {
+  const data = await callCloud<{ user: UserProfile; isNew?: boolean }>('login', {
+    action: 'login',
+    nickName,
+    avatarUrl,
+  })
+  saveUser(data.user)
+  return data.user
+}
+
+export async function fetchProfile(): Promise<UserProfile | null> {
+  try {
+    const data = await callCloud<{ user: UserProfile }>('login', { action: 'getProfile' })
+    saveUser(data.user)
+    return data.user
+  } catch {
+    return null
+  }
+}
+
+export async function cloudSignin(): Promise<{ user: UserProfile; reward: number }> {
+  const data = await callCloud<{ user: UserProfile; reward: number }>('login', {
+    action: 'signin',
+  })
+  saveUser(data.user)
+  return data
+}
+
+/** @deprecated 积分变更请走云函数，此方法仅作本地缓存同步 */
+export function syncUserPoints(user: UserProfile): void {
   saveUser(user)
-  return user
 }
 
 export function requireLogin(): boolean {
@@ -96,3 +108,5 @@ export function clearCache(): void {
   wx.removeStorageSync(HOME_CACHE_KEY)
   wx.showToast({ title: '缓存已清除', icon: 'success' })
 }
+
+export { COST }

@@ -20,7 +20,16 @@
       <text class="text-primary tip-text">每日签到得积分，畅享 docx 导出</text>
     </view>
 
-    <view class="waterfall">
+    <view wx:if="{{loading}}" class="empty-state">
+      <text class="text-muted">加载中...</text>
+    </view>
+
+    <view wx:elif="{{templates.length === 0}}" class="empty-state">
+      <view class="empty-icon">📄</view>
+      <text class="text-muted">暂无展览模板，去创作并分享吧</text>
+    </view>
+
+    <view class="waterfall" wx:else>
       <view class="waterfall-col">
         <view
           wx:for="{{leftCol}}"
@@ -35,6 +44,7 @@
           </view>
           <view class="card-body">
             <text class="card-title line-clamp-2">{{item.title}}</text>
+            <text wx:if="{{item.description}}" class="card-desc text-faint line-clamp-2">{{item.description}}</text>
             <view class="card-meta">
               <text class="text-faint meta-author">{{item.author}}</text>
               <text class="text-faint">♥ {{item.likes}}</text>
@@ -56,6 +66,7 @@
           </view>
           <view class="card-body">
             <text class="card-title line-clamp-2">{{item.title}}</text>
+            <text wx:if="{{item.description}}" class="card-desc text-faint line-clamp-2">{{item.description}}</text>
             <view class="card-meta">
               <text class="text-faint meta-author">{{item.author}}</text>
               <text class="text-faint">♥ {{item.likes}}</text>

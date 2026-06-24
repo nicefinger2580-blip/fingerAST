@@ -1,0 +1,10 @@
+{
+  "name": "exportDocx",
+  "version": "1.0.0",
+  "description": "导出论文大纲为 docx",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "docx": "^9.5.0"
+  }
+}

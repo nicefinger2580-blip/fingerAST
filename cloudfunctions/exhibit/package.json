@@ -1,0 +1,9 @@
+{
+  "name": "exhibit",
+  "version": "1.0.0",
+  "description": "模板展览：分享、列表、评论、点赞",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

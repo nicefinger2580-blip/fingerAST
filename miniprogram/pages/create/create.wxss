@@ -18,11 +18,12 @@
 .guide-title { font-size: 28rpx; font-weight: 600; }
 .guide-desc { font-size: 24rpx; margin-top: 8rpx; line-height: 1.5; }
 
-.label { font-size: 28rpx; font-weight: 500; margin-bottom: 16rpx; }
+.label { font-size: 28rpx; font-weight: 500; margin-bottom: 8rpx; }
+.hint-text { font-size: 22rpx; line-height: 1.5; margin-bottom: 16rpx; }
 .input-card { padding: 24rpx; position: relative; }
 .prompt-input {
   width: 100%;
-  min-height: 240rpx;
+  min-height: 320rpx;
   font-size: 28rpx;
   line-height: 1.6;
 }
@@ -62,6 +63,35 @@
 .action-btn { font-size: 24rpx; }
 
 .outline-card { padding: 32rpx; padding-bottom: 200rpx; }
+.paper-list { padding-bottom: 200rpx; }
+.paper-section {
+  display: block;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
+}
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.section-title {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.section-content {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  padding-left: 56rpx;
+}
+.paper-section.level-2 .section-title { font-weight: 500; color: var(--muted); }
+.paper-section.level-3 .section-content { padding-left: 72rpx; }
+
 .outline-item {
   display: flex;
   align-items: center;
