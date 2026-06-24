@@ -88,10 +88,10 @@
 }
 
 .card-desc {
-  display: block;
   font-size: 20rpx;
   line-height: 1.5;
   margin-top: 8rpx;
+  max-height: calc(20rpx * 1.5 * 3);
 }
 
 .card-meta {

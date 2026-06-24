@@ -4,10 +4,32 @@ const { COST } = require('./config')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+const CHINA_TZ_OFFSET = 8 * 60 * 60 * 1000
+
+function toChinaParts(dateInput) {
+  const ms = (dateInput instanceof Date ? dateInput : new Date(dateInput)).getTime()
+  if (Number.isNaN(ms)) return null
+  const d = new Date(ms + CHINA_TZ_OFFSET)
+  return {
+    year: d.getUTCFullYear(),
+    month: d.getUTCMonth() + 1,
+    date: d.getUTCDate(),
+    hours: d.getUTCHours(),
+    minutes: d.getUTCMinutes(),
+    seconds: d.getUTCSeconds(),
+  }
+}
+
 function todayStr() {
-  const d = new Date()
+  const p = toChinaParts(new Date())
   const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+  return `${p.year}-${pad(p.month)}-${pad(p.date)}`
+}
+
+function resolveSigninDate(clientDate) {
+  const value = (clientDate || '').trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  return todayStr()
 }
 
 function formatUser(doc) {
@@ -25,11 +47,10 @@ function formatUser(doc) {
 }
 
 function formatDateTime(value) {
-  if (!value) return ''
-  const d = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(d.getTime())) return ''
+  const p = toChinaParts(value)
+  if (!p) return ''
   const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return `${p.year}-${pad(p.month)}-${pad(p.date)} ${pad(p.hours)}:${pad(p.minutes)}:${pad(p.seconds)}`
 }
 
 function formatPaperSummary(doc) {
@@ -115,6 +136,19 @@ exports.main = async (event) => {
       return { success: true, data: { user: formatUser(user) } }
     }
 
+    if (action === 'checkSession') {
+      const user = await getUserByOpenid(openid)
+      if (!user) {
+        return { success: true, data: { user: null, registered: false } }
+      }
+      const now = db.serverDate()
+      await db.collection('users').doc(user._id).update({
+        data: { lastLoginAt: now, updatedAt: now },
+      })
+      const updated = await db.collection('users').doc(user._id).get()
+      return { success: true, data: { user: formatUser(updated.data), registered: true } }
+    }
+
     if (action === 'getPapers') {
       const res = await db.collection('papers').where({ openid }).limit(100).get()
       const list = sortByCreatedAtDesc(res.data).map(formatPaperSummary)
@@ -183,7 +217,7 @@ exports.main = async (event) => {
       if (!user) {
         return { success: false, message: '请先登录' }
       }
-      const today = todayStr()
+      const today = resolveSigninDate(event.clientDate)
       const signedDates = user.signedDates || []
       if (signedDates.includes(today)) {
         return { success: false, message: '今日已签到', code: 'ALREADY_SIGNED' }
@@ -207,42 +241,74 @@ exports.main = async (event) => {
       }
     }
 
-    // login / register
-    const nickName = (event.nickName || '微信用户').slice(0, 32)
-    const avatarUrl = event.avatarUrl || ''
-    const existing = await getUserByOpenid(openid)
-    const now = db.serverDate()
+    if (action === 'updateProfile') {
+      const nickName = (event.nickName || '').trim().slice(0, 32)
+      const avatarUrl = (event.avatarUrl || '').trim()
+      if (!nickName && !avatarUrl) {
+        return { success: false, message: '无更新内容' }
+      }
+      const user = await getUserByOpenid(openid)
+      if (!user) {
+        return { success: false, message: '用户未注册，请先登录' }
+      }
+      const update = { updatedAt: db.serverDate() }
+      if (nickName) update.nickName = nickName
+      if (avatarUrl) update.avatarUrl = avatarUrl
+      await db.collection('users').doc(user._id).update({ data: update })
+      const updated = await db.collection('users').doc(user._id).get()
+      return { success: true, data: { user: formatUser(updated.data) } }
+    }
 
-    if (existing) {
-      await db.collection('users').doc(existing._id).update({
-        data: {
-          nickName,
-          avatarUrl,
+    if (action === 'login') {
+      const unionid = wxContext.UNIONID || ''
+      const appid = wxContext.APPID || ''
+      const nickName = (event.nickName || '').trim().slice(0, 32)
+      const avatarUrl = (event.avatarUrl || '').trim()
+      const existing = await getUserByOpenid(openid)
+      const now = db.serverDate()
+
+      if (existing) {
+        const update = {
+          lastLoginAt: now,
           updatedAt: now,
-        },
-      })
-      const updated = await db.collection('users').doc(existing._id).get()
-      return { success: true, data: { user: formatUser(updated.data), isNew: false } }
+        }
+        if (nickName) update.nickName = nickName
+        if (avatarUrl) update.avatarUrl = avatarUrl
+        if (unionid && !existing.unionid) update.unionid = unionid
+        if (appid) update.appid = appid
+        await db.collection('users').doc(existing._id).update({ data: update })
+        const updated = await db.collection('users').doc(existing._id).get()
+        return { success: true, data: { user: formatUser(updated.data), isNew: false } }
+      }
+
+      if (!nickName) {
+        return { success: false, message: '请先授权微信昵称与头像' }
+      }
+
+      const newUser = {
+        openid,
+        unionid: unionid || '',
+        appid: appid || '',
+        nickName,
+        avatarUrl: avatarUrl || '',
+        points: COST.registerReward,
+        signedDays: 0,
+        signedDates: [],
+        historyCount: 0,
+        createdAt: now,
+        updatedAt: now,
+        lastLoginAt: now,
+      }
+      const addRes = await db.collection('users').add({ data: newUser })
+      await addPointRecord(openid, '新用户注册奖励', COST.registerReward, 'earn')
+      const created = await db.collection('users').doc(addRes._id).get()
+      return {
+        success: true,
+        data: { user: formatUser(created.data), isNew: true },
+      }
     }
 
-    const newUser = {
-      openid,
-      nickName,
-      avatarUrl,
-      points: COST.registerReward,
-      signedDays: 0,
-      signedDates: [],
-      historyCount: 0,
-      createdAt: now,
-      updatedAt: now,
-    }
-    const addRes = await db.collection('users').add({ data: newUser })
-    await addPointRecord(openid, '新用户注册奖励', COST.registerReward, 'earn')
-    const created = await db.collection('users').doc(addRes._id).get()
-    return {
-      success: true,
-      data: { user: formatUser(created.data), isNew: true },
-    }
+    return { success: false, message: '未知 action' }
   } catch (err) {
     console.error('login error', err)
     return { success: false, message: err.message || '服务异常' }

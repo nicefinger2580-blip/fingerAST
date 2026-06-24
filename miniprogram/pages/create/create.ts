@@ -131,6 +131,18 @@ Page({
     this.setData({ expandAll: !this.data.expandAll })
   },
 
+  onBackToInput() {
+    this.setData({
+      status: 'input',
+      paperTitle: '',
+      outline: [],
+      paperId: '',
+      shared: false,
+      expandAll: true,
+      generating: false,
+    })
+  },
+
   onCheckChange(e: WechatMiniprogram.CustomEvent) {
     const ids = e.detail.value as string[]
     const outline = this.data.outline.map(item => ({

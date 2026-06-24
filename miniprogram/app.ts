@@ -1,4 +1,4 @@
-import { getUser } from './utils/auth'
+import { getUser, silentLogin, isLoggedOut } from './utils/auth'
 import type { UserProfile } from './utils/types'
 
 App<IAppOption>({
@@ -7,9 +7,16 @@ App<IAppOption>({
     createFocus: false,
   },
   onLaunch() {
-    this.globalData.user = getUser()
     if (wx.cloud) {
       wx.cloud.init({ env: 'finger01-d5giuqcdn273e2cb8', traceUser: true })
+    }
+    if (!isLoggedOut()) {
+      this.globalData.user = getUser()
+      silentLogin().then((user) => {
+        if (user) {
+          this.globalData.user = user
+        }
+      })
     }
   },
   syncUser() {

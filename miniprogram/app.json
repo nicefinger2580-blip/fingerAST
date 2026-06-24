@@ -4,6 +4,8 @@
     "pages/create/create",
     "pages/resources/resources",
     "pages/mine/mine",
+    "pages/login/login",
+    "pages/profile/profile",
     "pages/search/search",
     "pages/detail/detail",
     "pages/history/history",
@@ -11,7 +13,7 @@
     "pages/signin/signin"
   ],
   "window": {
-    "navigationBarTitleText": "指尖论文",
+    "navigationBarTitleText": "指间论文",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#F5F7FA",

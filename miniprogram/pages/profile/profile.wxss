@@ -1,0 +1,98 @@
+.profile-page { padding-top: 24rpx; }
+
+.profile-card {
+  padding: 0 32rpx;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  min-height: 112rpx;
+  padding: 20rpx 0;
+}
+
+.profile-divider {
+  height: 1rpx;
+  background: var(--border, rgba(0, 0, 0, 0.06));
+}
+
+.item-label {
+  width: 96rpx;
+  flex-shrink: 0;
+  font-size: 30rpx;
+  color: var(--ink);
+}
+
+.item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.item-fill {
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar-wrap {
+  width: 88rpx;
+  height: 88rpx;
+  flex-shrink: 0;
+}
+
+.avatar-picker {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: 88rpx !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent;
+  border: none;
+  line-height: 1;
+  overflow: hidden;
+  border-radius: 44rpx;
+}
+.avatar-picker::after { border: none; }
+
+.avatar-img,
+.avatar-placeholder {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: block;
+}
+
+.avatar-placeholder {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.nickname-input {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: right;
+  height: 72rpx;
+  line-height: 72rpx;
+}
+
+.arrow {
+  font-size: 36rpx;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.profile-tip {
+  font-size: 24rpx;
+  text-align: center;
+  margin-top: 32rpx;
+  line-height: 1.6;
+}

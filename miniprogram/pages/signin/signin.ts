@@ -42,9 +42,10 @@ Page({
   },
 
   buildCalendar(year: number, month: number, signedDates: string[]): CalendarDay[] {
+    const now = new Date()
     const firstDay = new Date(year, month - 1, 1).getDay()
     const daysInMonth = new Date(year, month, 0).getDate()
-    const today = `${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     const cells: CalendarDay[] = []
     for (let i = 0; i < firstDay; i++) cells.push({ day: 0, signed: false, today: false, empty: true })
     for (let d = 1; d <= daysInMonth; d++) {

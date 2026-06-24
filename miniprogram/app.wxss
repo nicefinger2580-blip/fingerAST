@@ -98,6 +98,14 @@ page {
   overflow: hidden;
 }
 
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  word-break: break-all;
+}
+
 .bleed-x {
   margin-left: -32rpx;
   margin-right: -32rpx;

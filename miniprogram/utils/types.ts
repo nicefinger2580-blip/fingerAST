@@ -13,6 +13,7 @@ export interface TemplateItem {
   id: string
   title: string
   author: string
+  authorAvatarUrl?: string
   likes: number
   createdAt: string
   theme: string
@@ -25,6 +26,8 @@ export interface TemplateItem {
 export interface CommentItem {
   id: string
   author: string
+  authorAvatarUrl?: string
+  avatarError?: boolean
   content: string
   date: string
 }

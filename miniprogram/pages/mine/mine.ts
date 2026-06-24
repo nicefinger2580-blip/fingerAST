@@ -1,4 +1,14 @@
-import { getUser, logout, requireLogin, clearCache, cloudLogin, fetchProfile } from '../../utils/auth'
+import {
+  getUser,
+  logout,
+  requireLogin,
+  clearCache,
+  fetchProfile,
+  silentLogin,
+  goLoginPage,
+  isLoggedOut,
+  isLoggedIn,
+} from '../../utils/auth'
 import type { UserProfile } from '../../utils/types'
 
 Page({
@@ -7,7 +17,6 @@ Page({
     user: null as UserProfile | null,
     historyCount: 0,
     favoritePreview: '深度学习在医学影像中的应用',
-    loggingIn: false,
   },
 
   onShow() {
@@ -18,6 +27,12 @@ Page({
   },
 
   async refreshUser() {
+    if (isLoggedOut()) {
+      getApp<IAppOption>().globalData.user = null
+      this.setData({ loggedIn: false, user: null, historyCount: 0 })
+      return
+    }
+
     const local = getUser()
     if (local?.openid) {
       const remote = await fetchProfile()
@@ -30,6 +45,18 @@ Page({
       })
       return
     }
+
+    const silent = await silentLogin()
+    if (silent) {
+      getApp<IAppOption>().globalData.user = silent
+      this.setData({
+        loggedIn: true,
+        user: silent,
+        historyCount: silent.historyCount ?? 0,
+      })
+      return
+    }
+
     getApp<IAppOption>().globalData.user = null
     this.setData({
       loggedIn: false,
@@ -38,35 +65,14 @@ Page({
     })
   },
 
-  async onLoginTap() {
-    if (this.data.loggingIn) return
-    if (getUser()?.openid) return
+  onGoLogin() {
+    if (isLoggedIn()) return
+    goLoginPage()
+  },
 
-    this.setData({ loggingIn: true })
-    wx.showLoading({ title: '登录中...' })
-
-    const doLogin = async (nickName: string, avatarUrl: string) => {
-      try {
-        const user = await cloudLogin(nickName, avatarUrl)
-        getApp<IAppOption>().globalData.user = user
-        this.setData({ loggedIn: true, user, historyCount: user.historyCount ?? 0 })
-        wx.showToast({ title: '登录成功', icon: 'success' })
-      } catch (err) {
-        wx.showToast({
-          title: err instanceof Error ? err.message : '登录失败',
-          icon: 'none',
-        })
-      } finally {
-        wx.hideLoading()
-        this.setData({ loggingIn: false })
-      }
-    }
-
-    wx.getUserProfile({
-      desc: '用于完善会员资料',
-      success: (res) => doLogin(res.userInfo.nickName, res.userInfo.avatarUrl),
-      fail: () => doLogin('微信用户', ''),
-    })
+  onGoProfile() {
+    if (!requireLogin()) return
+    wx.navigateTo({ url: '/pages/profile/profile' })
   },
 
   onGridTap(e: WechatMiniprogram.TouchEvent) {
@@ -99,11 +105,15 @@ Page({
       content: '确定要退出登录吗？',
       confirmColor: '#3B7CFF',
       success: (res) => {
-        if (res.confirm) {
-          logout()
-          this.refreshUser()
-          wx.showToast({ title: '已退出', icon: 'none' })
-        }
+        if (!res.confirm) return
+        logout()
+        getApp<IAppOption>().globalData.user = null
+        this.setData({
+          loggedIn: false,
+          user: null,
+          historyCount: 0,
+        })
+        wx.showToast({ title: '已退出登录', icon: 'success' })
       },
     })
   },

@@ -43,8 +43,8 @@
             <text class="cover-emoji">📄</text>
           </view>
           <view class="card-body">
-            <text class="card-title line-clamp-2">{{item.title}}</text>
-            <text wx:if="{{item.description}}" class="card-desc text-faint line-clamp-2">{{item.description}}</text>
+            <view class="card-title line-clamp-2">{{item.title}}</view>
+            <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
             <view class="card-meta">
               <text class="text-faint meta-author">{{item.author}}</text>
               <text class="text-faint">♥ {{item.likes}}</text>
@@ -65,8 +65,8 @@
             <text class="cover-emoji">📄</text>
           </view>
           <view class="card-body">
-            <text class="card-title line-clamp-2">{{item.title}}</text>
-            <text wx:if="{{item.description}}" class="card-desc text-faint line-clamp-2">{{item.description}}</text>
+            <view class="card-title line-clamp-2">{{item.title}}</view>
+            <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
             <view class="card-meta">
               <text class="text-faint meta-author">{{item.author}}</text>
               <text class="text-faint">♥ {{item.likes}}</text>

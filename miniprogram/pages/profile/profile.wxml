@@ -1,0 +1,36 @@
+<view class="page page-pad profile-page">
+  <view class="card profile-card">
+    <view class="profile-item">
+      <text class="item-label">头像</text>
+      <view class="item-body">
+        <view class="item-fill"></view>
+        <view class="avatar-wrap">
+          <button class="avatar-picker" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+            <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
+          </button>
+        </view>
+        <text class="text-faint arrow">›</text>
+      </view>
+    </view>
+
+    <view class="profile-divider"></view>
+
+    <view class="profile-item">
+      <text class="item-label">昵称</text>
+      <view class="item-body">
+        <input
+          class="nickname-input item-fill"
+          type="nickname"
+          placeholder="点击输入昵称"
+          value="{{user.nickName}}"
+          bindblur="onNicknameBlur"
+          bindinput="onNicknameInput"
+        />
+        <text class="text-faint arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="text-faint profile-tip">点击头像或昵称即可修改，修改后自动保存</view>
+</view>

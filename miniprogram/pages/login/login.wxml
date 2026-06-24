@@ -1,0 +1,68 @@
+<view class="page login-page">
+  <view class="login-bg"></view>
+
+  <view class="login-body">
+    <view class="brand-block">
+      <view class="brand-logo">📄</view>
+      <view class="brand-name">指间论文</view>
+      <view class="brand-desc">智能论文创作与模板分享</view>
+    </view>
+
+    <view class="card profile-preview-card">
+      <view class="preview-label text-faint">授权你的微信头像与昵称</view>
+
+      <view class="auth-field">
+        <text class="field-label">头像</text>
+        <view class="field-body">
+          <view class="field-fill"></view>
+          <view class="avatar-wrap">
+            <button class="avatar-picker" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+              <image
+                wx:if="{{previewAvatar}}"
+                class="preview-avatar"
+                src="{{previewAvatar}}"
+                mode="aspectFill"
+              />
+              <view wx:else class="preview-avatar preview-avatar-empty">点击选择</view>
+            </button>
+          </view>
+          <text class="text-faint arrow">›</text>
+        </view>
+      </view>
+
+      <view class="auth-divider"></view>
+
+      <view class="auth-field">
+        <text class="field-label">昵称</text>
+        <view class="field-body">
+          <input
+            class="nickname-input field-fill"
+            type="nickname"
+            placeholder="点击填写微信昵称"
+            value="{{previewNickName}}"
+            bindinput="onNicknameInput"
+            bindblur="onNicknameBlur"
+          />
+          <text class="text-faint arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card auth-card">
+      <view class="auth-tip text-muted">
+        点击上方头像、填写昵称后完成登录。
+      </view>
+      <button
+        class="wx-auth-btn {{canLogin ? '' : 'wx-auth-btn-disabled'}}"
+        bindtap="onWechatAuth"
+        loading="{{loggingIn}}"
+        disabled="{{loggingIn}}"
+      >
+        <text class="wx-icon">💬</text>
+        <text>微信授权登录</text>
+      </button>
+    </view>
+
+    <view class="cancel-link" bindtap="onCancel">暂不登录</view>
+  </view>
+</view>

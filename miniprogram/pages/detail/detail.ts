@@ -14,6 +14,41 @@ Page({
     loading: true,
     commentInput: '',
     submittingComment: false,
+    bodyExpanded: false,
+    hasBodyContent: false,
+    canComment: false,
+    authorAvatarError: false,
+  },
+
+  setTemplateData(template: TemplateItem, extra: Record<string, unknown> = {}) {
+    const hasBodyContent = (template.outline || []).some(
+      (item) => item.content && String(item.content).trim(),
+    )
+    this.setData({
+      template,
+      hasBodyContent,
+      bodyExpanded: false,
+      authorAvatarError: false,
+      ...extra,
+    })
+  },
+
+  onAuthorAvatarError() {
+    this.setData({ authorAvatarError: true })
+  },
+
+  onCommentAvatarError(e: WechatMiniprogram.BaseEvent) {
+    const id = e.currentTarget.dataset.id as string
+    const { template } = this.data
+    if (!template?.comments) return
+    const comments = template.comments.map((item) =>
+      item.id === id ? { ...item, avatarError: true } : item,
+    )
+    this.setData({ template: { ...template, comments } })
+  },
+
+  onToggleBody() {
+    this.setData({ bodyExpanded: !this.data.bodyExpanded })
   },
 
   onLoad(options: { id?: string; type?: string }) {
@@ -28,7 +63,7 @@ Page({
     const template = getTemplateById(options.id || '1')
     if (template) {
       wx.setNavigationBarTitle({ title: '模板详情' })
-      this.setData({ template, paperMode: false, exhibitMode: false, loading: false })
+      this.setTemplateData(template, { paperMode: false, exhibitMode: false, loading: false })
     } else {
       this.setData({ loading: false })
     }
@@ -49,8 +84,8 @@ Page({
       }>('login', { action: 'getPaper', paperId })
       const user = getUser()
       const { paper } = data
-      this.setData({
-        template: {
+      this.setTemplateData(
+        {
           id: paper.id,
           title: paper.title,
           author: user?.nickName || '我',
@@ -61,8 +96,8 @@ Page({
           outline: paper.outline,
           comments: [],
         },
-        loading: false,
-      })
+        { loading: false },
+      )
     } catch (err) {
       this.setData({ loading: false })
       wx.showToast({
@@ -74,16 +109,19 @@ Page({
 
   async loadExhibit(paperId: string) {
     wx.setNavigationBarTitle({ title: '模板详情' })
-    this.setData({ loading: true, paperMode: false, exhibitMode: true, paperId })
+    this.setData({ loading: true, paperMode: false, exhibitMode: true, paperId, canComment: true })
     try {
       const data = await callCloud<{
         template: TemplateItem
         liked: boolean
       }>('exhibit', { action: 'getDetail', paperId })
-      this.setData({
-        template: data.template,
+      this.setTemplateData(data.template, {
         liked: data.liked,
         loading: false,
+        paperMode: false,
+        exhibitMode: true,
+        paperId,
+        canComment: true,
       })
     } catch (err) {
       this.setData({ loading: false })
@@ -133,7 +171,7 @@ Page({
   },
 
   async onSubmitComment() {
-    if (!this.data.exhibitMode) return
+    if (!this.data.canComment || !this.data.paperId || this.data.paperMode) return
     if (!requireLogin()) return
     const { paperId, template, commentInput, submittingComment } = this.data
     if (submittingComment || !paperId || !template) return

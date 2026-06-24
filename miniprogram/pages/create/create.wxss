@@ -23,9 +23,10 @@
 .input-card { padding: 24rpx; position: relative; }
 .prompt-input {
   width: 100%;
-  min-height: 320rpx;
+  height: 320rpx;
   font-size: 28rpx;
   line-height: 1.6;
+  box-sizing: border-box;
 }
 .char-count {
   position: absolute;
@@ -51,6 +52,17 @@
 .prompt-preview { padding: 24rpx; font-size: 24rpx; }
 .loading-title { font-size: 32rpx; font-weight: 500; margin-bottom: 16rpx; }
 .cancel-link { margin-top: 32rpx; text-decoration: underline; font-size: 28rpx; }
+
+.back-row {
+  display: flex;
+  align-items: center;
+}
+
+.back-btn {
+  font-size: 28rpx;
+  color: var(--muted);
+  padding: 8rpx 0;
+}
 
 .result-head {
   display: flex;

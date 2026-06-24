@@ -6,7 +6,7 @@
         <view class="guide-icon">💡</view>
         <view>
           <view class="guide-title">AI 智能生成论文全文</view>
-          <view class="text-muted guide-desc">输入题目与格式规范，AI 将严格按你的要求生成完整论文</view>
+          <view class="text-muted guide-desc">自由描述论文需求，AI 将根据你的提示词生成完整论文</view>
         </view>
       </view>
     </view>
@@ -17,11 +17,10 @@
       <view class="card input-card">
         <textarea
           class="prompt-input"
-          placeholder="示例：&#10;【题目】基于深度学习的…&#10;【格式】硕士论文；摘要300字；正文8000字；GB/T 7714引用；章节：摘要/引言/…/参考文献"
+          placeholder="请输入论文主题、研究方向或写作要求，例如：探讨人工智能在医疗诊断中的应用与伦理问题"
           maxlength="{{maxLen}}"
           value="{{prompt}}"
           bindinput="onPromptInput"
-          auto-height
           show-confirm-bar="{{false}}"
         />
         <text class="char-count text-faint">{{charCount}}/{{maxLen}}</text>
@@ -29,7 +28,7 @@
     </view>
 
     <view class="mt-3">
-      <view class="text-muted preset-label">示例提示词（含格式规范）</view>
+      <view class="text-muted preset-label">示例提示词</view>
       <view class="preset-row">
         <view
           wx:for="{{presets}}"
@@ -63,14 +62,18 @@
     <view class="loading-wrap">
       <view class="loading-ring"></view>
       <text class="loading-title">AI 正在撰写论文...</text>
-      <text class="text-faint">全文生成约需 30~90 秒，请耐心等待</text>
+      <text class="text-faint">全文生成约需 30~60 秒，请耐心等待</text>
       <text class="cancel-link text-muted" bindtap="onCancelGenerate">取消生成</text>
     </view>
   </block>
 
   <!-- 结果态 -->
   <block wx:else>
-    <view class="result-head mt-3">
+    <view class="back-row mt-3">
+      <text class="back-btn" bindtap="onBackToInput">‹ 返回</text>
+    </view>
+
+    <view class="result-head mt-2">
       <view>
         <view class="result-title">{{paperTitle || '生成结果'}}</view>
         <view class="text-faint result-sub">共 {{outline.length}} 个章节 · 可勾选导出</view>

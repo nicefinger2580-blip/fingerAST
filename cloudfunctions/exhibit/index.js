@@ -28,16 +28,101 @@ function formatShortDate(value) {
   return `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
+async function getUsersByOpenids(openids) {
+  const map = new Map()
+  const list = [...new Set((openids || []).filter(Boolean))]
+  if (list.length === 0) return map
+  const res = await db.collection('users').where({
+    openid: db.command.in(list.slice(0, 100)),
+  }).get()
+  res.data.forEach((user) => map.set(user.openid, user))
+  return map
+}
+
+async function batchResolveAvatarUrls(urls) {
+  const result = new Map()
+  const unique = [...new Set((urls || []).filter(Boolean))]
+  unique.forEach((url) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      result.set(url, url)
+    }
+  })
+  const cloudFiles = unique.filter((url) => url.startsWith('cloud://'))
+  for (let i = 0; i < cloudFiles.length; i += 50) {
+    const batch = cloudFiles.slice(i, i + 50)
+    try {
+      const res = await cloud.getTempFileURL({ fileList: batch })
+      ;(res.fileList || []).forEach((item) => {
+        if (item.status === 0 && item.tempFileURL) {
+          result.set(item.fileID, item.tempFileURL)
+        }
+      })
+    } catch (err) {
+      console.error('getTempFileURL failed', err)
+    }
+  }
+  return result
+}
+
+function pickResolvedAvatar(raw, map) {
+  if (!raw) return ''
+  if (map.has(raw)) return map.get(raw)
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
+  return ''
+}
+
+async function resolveAuthorInfo(paper) {
+  let author = paper.authorNickName || '匿名用户'
+  let authorAvatarUrl = paper.authorAvatarUrl || ''
+  if (paper.openid) {
+    const user = await getUserByOpenid(paper.openid)
+    if (user) {
+      if (user.nickName) author = user.nickName
+      if (user.avatarUrl) authorAvatarUrl = user.avatarUrl
+    }
+  }
+  const urlMap = await batchResolveAvatarUrls([authorAvatarUrl])
+  return {
+    author,
+    authorAvatarUrl: pickResolvedAvatar(authorAvatarUrl, urlMap),
+  }
+}
+
+async function buildCommentList(docs) {
+  const openids = docs.map((doc) => doc.openid).filter(Boolean)
+  const userMap = await getUsersByOpenids(openids)
+  const items = docs.map((doc) => {
+    const user = userMap.get(doc.openid)
+    const rawAvatar = doc.authorAvatarUrl || user?.avatarUrl || ''
+    return {
+      id: doc._id,
+      author: doc.authorNickName || user?.nickName || '匿名用户',
+      rawAvatar,
+      content: doc.content,
+      date: formatShortDate(doc.createdAt),
+    }
+  })
+  const urlMap = await batchResolveAvatarUrls(items.map((item) => item.rawAvatar))
+  return items.map((item) => ({
+    id: item.id,
+    author: item.author,
+    authorAvatarUrl: pickResolvedAvatar(item.rawAvatar, urlMap),
+    content: item.content,
+    date: item.date,
+  }))
+}
+
 function formatExhibitCard(doc) {
   const outline = doc.outline || []
   return {
     id: doc._id,
     title: doc.title || (doc.prompt || '').slice(0, 80),
     author: doc.authorNickName || '匿名用户',
+    authorAvatarUrl: doc.authorAvatarUrl || '',
     likes: doc.likes || 0,
     createdAt: formatDateTime(doc.sharedAt || doc.createdAt),
     theme: pickTheme(doc._id),
-    description: (doc.prompt || '').slice(0, 80),
+    description: doc.prompt || '',
     sectionCount: outline.length,
   }
 }
@@ -46,6 +131,7 @@ function formatComment(doc) {
   return {
     id: doc._id,
     author: doc.authorNickName || '匿名用户',
+    authorAvatarUrl: doc.authorAvatarUrl || '',
     content: doc.content,
     date: formatShortDate(doc.createdAt),
   }
@@ -123,12 +209,21 @@ exports.main = async (event) => {
       }
 
       if (paper.status === 'shared') {
+        const user = await getUserByOpenid(openid)
+        await db.collection('papers').doc(paperId).update({
+          data: {
+            authorNickName: user?.nickName || paper.authorNickName || '微信用户',
+            authorAvatarUrl: user?.avatarUrl || paper.authorAvatarUrl || '',
+            updatedAt: db.serverDate(),
+          },
+        })
+        const refreshed = await db.collection('papers').doc(paperId).get()
         return {
           success: true,
           data: {
             paperId,
             alreadyShared: true,
-            template: formatExhibitCard(paper),
+            template: formatExhibitCard(refreshed.data),
           },
         }
       }
@@ -209,15 +304,19 @@ exports.main = async (event) => {
         .where({ paperId })
         .limit(100)
         .get()
-      const comments = sortDocsByTimeDesc(commentsRes.data, 'createdAt').map(formatComment)
+      const comments = await buildCommentList(
+        sortDocsByTimeDesc(commentsRes.data, 'createdAt'),
+      )
       const liked = await isLiked(paperId, openid)
+      const { author, authorAvatarUrl } = await resolveAuthorInfo(paper)
       return {
         success: true,
         data: {
           template: {
             id: paper._id,
             title: paper.title || (paper.prompt || '').slice(0, 80),
-            author: paper.authorNickName || '匿名用户',
+            author,
+            authorAvatarUrl,
             likes: paper.likes || 0,
             createdAt: formatDateTime(paper.sharedAt || paper.createdAt),
             theme: pickTheme(paper._id),
@@ -244,21 +343,25 @@ exports.main = async (event) => {
         return { success: false, message: '模板不存在或未公开' }
       }
       const user = await getUserByOpenid(openid)
+      const rawAvatar = user?.avatarUrl || ''
       const addRes = await db.collection('exhibit_comments').add({
         data: {
           paperId,
           openid,
           authorNickName: user?.nickName || '微信用户',
+          authorAvatarUrl: rawAvatar,
           content,
           createdAt: db.serverDate(),
         },
       })
-      const comment = formatComment({
-        _id: addRes._id,
-        authorNickName: user?.nickName || '微信用户',
+      const urlMap = await batchResolveAvatarUrls([rawAvatar])
+      const comment = {
+        id: addRes._id,
+        author: user?.nickName || '微信用户',
+        authorAvatarUrl: pickResolvedAvatar(rawAvatar, urlMap),
         content,
-        createdAt: new Date(),
-      })
+        date: formatShortDate(new Date()),
+      }
       return { success: true, data: { comment } }
     }
 

@@ -1,4 +1,4 @@
-<view class="page page-pad">
+<view class="page page-pad {{canComment ? 'page-with-comment-bar' : 'page-with-bottom-bar'}}">
   <view wx:if="{{loading}}" class="empty-state mt-4">
     <text class="text-muted">加载中...</text>
   </view>
@@ -14,7 +14,14 @@
   <view class="card author-card mt-3">
     <view class="author-row">
       <view class="author-left">
-        <view class="author-avatar">{{template.author[0]}}</view>
+        <image
+          wx:if="{{template.authorAvatarUrl && !authorAvatarError}}"
+          class="author-avatar-img"
+          src="{{template.authorAvatarUrl}}"
+          mode="aspectFill"
+          binderror="onAuthorAvatarError"
+        />
+        <view wx:else class="author-avatar">{{template.author[0]}}</view>
         <view>
           <view class="author-name">{{template.author}}</view>
           <view class="text-faint author-date">发布于 {{template.createdAt}}</view>
@@ -31,21 +38,39 @@
         </view>
       </view>
     </view>
-    <view class="desc text-muted">{{template.description || template.title}}</view>
+    <view class="desc text-muted line-clamp-3">{{template.description || template.title}}</view>
   </view>
 
   <view class="card outline-section mt-3">
-    <view class="section-title">论文正文</view>
+    <view class="section-head">
+      <view class="section-title">论文正文</view>
+      <view wx:if="{{hasBodyContent}}" class="expand-btn text-primary" bindtap="onToggleBody">{{bodyExpanded ? '收起' : '展开全文'}}</view>
+    </view>
     <block wx:for="{{template.outline}}" wx:key="id">
       <view class="outline-line level-{{item.level}}">{{item.title}}</view>
-      <view wx:if="{{item.content}}" class="paper-content level-{{item.level}}">{{item.content}}</view>
+      <view
+        wx:if="{{bodyExpanded && item.content}}"
+        class="paper-content level-{{item.level}}"
+      >{{item.content}}</view>
     </block>
+    <view wx:if="{{!bodyExpanded && hasBodyContent}}" class="body-fold-hint text-faint">
+      正文已折叠，点击「展开全文」查看完整内容
+    </view>
   </view>
 
-  <view class="card comments mt-3 mb-bar" wx:if="{{!paperMode}}">
-    <view class="section-title">评论 ({{template.comments.length || 0}})</view>
+  <view class="card comments mt-3" wx:if="{{!paperMode}}">
+    <view class="section-title">评论 ({{template.comments ? template.comments.length : 0}})</view>
+    <view wx:if="{{template.comments && template.comments.length === 0}}" class="comment-empty text-faint">暂无评论，快来抢沙发吧</view>
     <view wx:for="{{template.comments}}" wx:key="id" class="comment-item">
-      <view class="comment-avatar">{{item.author[0]}}</view>
+      <image
+        wx:if="{{item.authorAvatarUrl && !item.avatarError}}"
+        class="comment-avatar-img"
+        src="{{item.authorAvatarUrl}}"
+        mode="aspectFill"
+        data-id="{{item.id}}"
+        binderror="onCommentAvatarError"
+      />
+      <view wx:else class="comment-avatar">{{item.author[0]}}</view>
       <view>
         <view class="comment-head">
           <text class="comment-author">{{item.author}}</text>
@@ -54,18 +79,19 @@
         <view class="text-muted comment-text">{{item.content}}</view>
       </view>
     </view>
-    <view wx:if="{{exhibitMode}}" class="comment-form">
-      <input
-        class="comment-input"
-        placeholder="写下你的评论..."
-        maxlength="200"
-        value="{{commentInput}}"
-        bindinput="onCommentInput"
-        confirm-type="send"
-        bindconfirm="onSubmitComment"
-      />
-      <button class="comment-send" size="mini" bindtap="onSubmitComment" disabled="{{submittingComment}}">发送</button>
-    </view>
+  </view>
+
+  <view wx:if="{{canComment}}" class="comment-bar">
+    <input
+      class="comment-input"
+      placeholder="写下你的评论..."
+      maxlength="200"
+      value="{{commentInput}}"
+      bindinput="onCommentInput"
+      confirm-type="send"
+      bindconfirm="onSubmitComment"
+    />
+    <button class="comment-send" size="mini" bindtap="onSubmitComment" disabled="{{submittingComment}}">发送</button>
   </view>
 
   <view class="detail-bottom">

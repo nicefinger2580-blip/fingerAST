@@ -74,7 +74,9 @@ cd ../exhibit && npm install
 
 ### login
 
-- `action: 'login'` — 登录/注册（传入 nickName、avatarUrl）
+- `action: 'login'` — 微信登录/注册（服务端通过 OPENID 识别用户，无需客户端传 code）
+- `action: 'checkSession'` — 静默检查登录态（已注册则返回用户，未注册不自动创建）
+- `action: 'updateProfile'` — 更新昵称/头像
 - `action: 'getProfile'` — 获取最新用户信息
 - `action: 'getPapers'` — 获取创作历史列表
 - `action: 'getPaper'` — 获取单条创作详情（需 `paperId`）

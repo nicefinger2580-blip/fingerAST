@@ -1,11 +1,11 @@
 <view class="page mine-page">
   <!-- 未登录 -->
   <block wx:if="{{!loggedIn}}">
-    <view class="profile-header profile-header-guest" bindtap="onLoginTap">
+    <view class="profile-header profile-header-guest" bindtap="onGoLogin">
       <view class="avatar avatar-guest">👤</view>
       <view class="guest-info">
         <view class="name text-primary">点击登录</view>
-        <view class="text-faint sub">登录后体验完整功能</view>
+        <view class="text-faint sub">微信授权后体验完整功能</view>
       </view>
     </view>
 
@@ -28,8 +28,8 @@
       <view class="card login-modal mine-section">
         <view class="modal-icon">!</view>
         <view class="modal-title">请先登录以使用该功能</view>
-        <view class="text-muted modal-desc">登录后可使用创作、签到、导出等完整功能</view>
-        <button class="btn-primary login-btn" bindtap="onLoginTap">微信一键登录</button>
+        <view class="text-muted modal-desc">选择微信头像与昵称后即可登录</view>
+        <button class="btn-primary login-btn" bindtap="onGoLogin">微信授权登录</button>
       </view>
 
       <view class="footer-links mine-section">
@@ -42,12 +42,12 @@
   <!-- 已登录 -->
   <block wx:else>
     <view class="profile-header profile-row">
-      <view class="user-row" bindtap="onLoginTap">
+      <view class="user-row" bindtap="onGoProfile">
         <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
         <view wx:else class="avatar avatar-user">{{user.nickName[0]}}</view>
-        <view>
+        <view class="user-meta">
           <view class="name">{{user.nickName}}</view>
-          <view class="text-faint sub">微信用户</view>
+          <view class="text-faint sub">点击编辑资料 ›</view>
         </view>
       </view>
       <view class="points-badge" bindtap="onPointsTap">
