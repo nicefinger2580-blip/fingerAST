@@ -13,6 +13,7 @@ export interface TemplateItem {
   id: string
   title: string
   author: string
+  authorOpenid?: string
   authorAvatarUrl?: string
   likes: number
   createdAt: string
@@ -21,6 +22,9 @@ export interface TemplateItem {
   sectionCount?: number
   outline?: OutlineNode[]
   comments?: CommentItem[]
+  coverPattern?: number
+  coverSize?: 'sm' | 'md' | 'lg'
+  avatarError?: boolean
 }
 
 export interface CommentItem {
@@ -57,6 +61,47 @@ export interface ResourceItem {
   tagColor: string
   count: string
   category: number
+  subType?: string
+  subTypeLabel?: string
+  icon?: string
+  url?: string
+  content?: string
+  hasContent?: boolean
+  sort?: number
+}
+
+export interface ResourceGroup {
+  subType: string
+  label: string
+  items: ResourceItem[]
+}
+
+export interface FavoriteItem {
+  id: string
+  paperId: string
+  title: string
+  author: string
+  desc?: string
+  theme?: string
+  favoritedAt: string
+}
+
+export interface FollowUserItem {
+  openid: string
+  nickName: string
+  avatarUrl: string
+  followedAt: string
+  avatarError?: boolean
+}
+
+export interface UserPublicProfile {
+  openid: string
+  nickName: string
+  avatarUrl: string
+  followerCount: number
+  followingCount: number
+  isSelf: boolean
+  following: boolean
 }
 
 export interface PointRecord {

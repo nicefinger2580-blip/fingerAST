@@ -1,6 +1,6 @@
 {
   "miniVersion": "v2",
-  "name": "%name%",
+  "name": "指间论文",
   "version": "0.0.1",
   "versionCode": 100,
   "i18nFilePath": "i18n",
@@ -16,7 +16,8 @@
       "bluetooth": false,
       "network": false,
       "scanner": false,
-      "xweb": false
+      "xweb": false,
+      "skyline": true
     },
     "icons": {
       "hdpi": "",
@@ -29,7 +30,7 @@
       "xhdpi": "",
       "xxhdpi": ""
     },
-    "enableVConsole": "open",
+    "enableVConsole": "close",
     "privacy": {
       "enable": true
     }

@@ -13,6 +13,10 @@
 | `point_records` | 积分变动记录 |
 | `exhibit_comments` | 展览模板评论 |
 | `exhibit_likes` | 展览模板点赞记录 |
+| `exhibit_favorites` | 展览模板收藏记录 |
+| `user_follows` | 用户关注关系（followerOpenid → followeeOpenid） |
+| `point_orders` | 积分充值订单（微信支付） |
+| `resources` | 资源页内容（素材、工具、教程） |
 
 ### 推荐权限
 
@@ -20,6 +24,10 @@
 - `papers`：仅创建者可读写
 - `exhibit_comments`：仅创建者可读写（通过云函数写入）
 - `exhibit_likes`：仅创建者可读写（通过云函数写入）
+- `exhibit_favorites`：仅创建者可读写（通过云函数写入）
+- `user_follows`：仅创建者可读写（通过云函数写入）
+- `point_orders`：仅云函数可读写
+- `resources`：所有用户可读（推荐）；内容通过云控制台或 `resources` 云函数 seed 写入
 
 ## 二、配置云函数环境变量
 
@@ -28,6 +36,7 @@
 | 变量名 | 值 | 适用函数 |
 |--------|-----|----------|
 | `DEEPSEEK_API_KEY` | [DeepSeek 开放平台](https://platform.deepseek.com/) API Key | `generatePaper` |
+| `WX_PAY_SUB_MCH_ID` | 微信支付商户号 mch_id | `pay` |
 
 > 也兼容旧变量名 `DASHSCOPE_API_KEY`（若已配置可暂不改名）。
 >
@@ -45,6 +54,13 @@
 2. 右键 `cloudfunctions/generatePaper` → **上传并部署：云端安装依赖**
 3. 右键 `cloudfunctions/exportDocx` → **上传并部署：云端安装依赖**
 4. 右键 `cloudfunctions/exhibit` → **上传并部署：云端安装依赖**
+5. 右键 `cloudfunctions/resources` → **上传并部署：云端安装依赖**
+6. 右键 `cloudfunctions/pay` → **上传并部署：云端安装依赖**
+7. 右键 `cloudfunctions/payCallback` → **上传并部署：云端安装依赖**
+
+> 积分充值（微信支付）配置详见 [payment-setup.md](./payment-setup.md)
+
+> 资源页配置详见 [resources-setup.md](./resources-setup.md)
 
 > **重要**：`generatePaper` 和 `exportDocx` 目录下已有 `config.json`，超时设为 **60 秒**（默认仅 3 秒，AI 生成会超时）。部署后若仍报 `-504003`，请到云开发控制台 → 云函数 → 对应函数 → **配置** → 手动将超时改为 60 秒并保存。
 
@@ -55,9 +71,18 @@ cd cloudfunctions/login && npm install
 cd ../generatePaper && npm install
 cd ../exportDocx && npm install
 cd ../exhibit && npm install
+cd ../resources && npm install
 ```
 
 ## 四、云函数说明
+
+### resources（资源页）
+
+| action | 说明 |
+|--------|------|
+| `list` | 资源列表（`category`: 0 开源素材 / 1 实用工具 / 2 编写教程） |
+| `getDetail` | 资源详情（教程 Markdown、提示词全文） |
+| `seed` | 写入示例数据（首次可手动调用） |
 
 ### exhibit（展厅）
 
@@ -71,6 +96,8 @@ cd ../exhibit && npm install
 | `getDetail` | 模板详情（评论、点赞状态） | 否 |
 | `addComment` | 发表评论 | 是 |
 | `toggleLike` | 点赞/取消 | 是 |
+| `toggleFavorite` | 收藏/取消收藏（需 `paperId`） | 是 |
+| `listFavorites` | 我的收藏列表 | 是 |
 
 ### login
 
@@ -83,6 +110,16 @@ cd ../exhibit && npm install
 - `action: 'deletePaper'` — 删除创作记录（需 `paperId`）
 - `action: 'getPointRecords'` — 获取积分变动记录
 - `action: 'signin'` — 每日签到
+
+### pay（积分充值）
+
+| action | 说明 | 需登录 |
+|--------|------|--------|
+| `getPackages` | 充值套餐列表 | 是 |
+| `createOrder` | 创建微信支付订单（需 `packId`） | 是 |
+| `queryOrder` | 查询订单并入账（需 `outTradeNo`） | 是 |
+
+`payCallback` 为微信支付回调，自动入账，无需手动调用。
 
 ### generatePaper
 

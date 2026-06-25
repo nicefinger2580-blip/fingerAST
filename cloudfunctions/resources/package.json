@@ -1,0 +1,9 @@
+{
+  "name": "resources",
+  "version": "1.0.0",
+  "description": "资源页：开源素材、实用工具、编写教程",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

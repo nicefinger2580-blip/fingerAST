@@ -13,7 +13,7 @@
 
   <view class="card author-card mt-3">
     <view class="author-row">
-      <view class="author-left">
+      <view class="author-left" bindtap="onGoAuthorProfile">
         <image
           wx:if="{{template.authorAvatarUrl && !authorAvatarError}}"
           class="author-avatar-img"
@@ -27,14 +27,19 @@
           <view class="text-faint author-date">发布于 {{template.createdAt}}</view>
         </view>
       </view>
+      <view
+        wx:if="{{exhibitMode && !authorIsSelf}}"
+        class="follow-chip {{authorFollowing ? 'follow-chip-active' : ''}}"
+        bindtap="onToggleFollowAuthor"
+      >{{authorFollowing ? '已关注' : '+ 关注'}}</view>
       <view class="author-actions" wx:if="{{!paperMode}}">
         <view class="action-col" bindtap="onLike">
           <text class="{{liked ? 'liked' : ''}}">♥</text>
           <text class="text-faint action-num">{{template.likes}}</text>
         </view>
-        <view class="action-col" bindtap="onFavorite" wx:if="{{!exhibitMode}}">
-          <text>🔖</text>
-          <text class="text-faint action-num">收藏</text>
+        <view class="action-col" bindtap="onFavorite" wx:if="{{exhibitMode}}">
+          <text class="{{favorited ? 'favorited' : ''}}">🔖</text>
+          <text class="text-faint action-num">{{favorited ? '已收藏' : '收藏'}}</text>
         </view>
       </view>
     </view>

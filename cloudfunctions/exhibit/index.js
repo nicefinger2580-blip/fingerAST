@@ -4,7 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
 const THEMES = ['blue', 'teal', 'indigo', 'amber']
-const AUTH_ACTIONS = new Set(['share', 'addComment', 'toggleLike'])
+const AUTH_ACTIONS = new Set(['share', 'addComment', 'toggleLike', 'toggleFavorite', 'listFavorites'])
 
 function pickTheme(id) {
   let sum = 0
@@ -127,6 +127,23 @@ function formatExhibitCard(doc) {
   }
 }
 
+async function buildExhibitCardList(docs) {
+  const openids = docs.map((doc) => doc.openid).filter(Boolean)
+  const userMap = await getUsersByOpenids(openids)
+  const items = docs.map((doc) => {
+    const user = userMap.get(doc.openid)
+    const rawAvatar = doc.authorAvatarUrl || user?.avatarUrl || ''
+    const author = doc.authorNickName || user?.nickName || '匿名用户'
+    return { card: formatExhibitCard(doc), author, rawAvatar }
+  })
+  const urlMap = await batchResolveAvatarUrls(items.map((item) => item.rawAvatar))
+  return items.map(({ card, author, rawAvatar }) => ({
+    ...card,
+    author,
+    authorAvatarUrl: pickResolvedAvatar(rawAvatar, urlMap),
+  }))
+}
+
 function formatComment(doc) {
   return {
     id: doc._id,
@@ -164,6 +181,79 @@ async function isLiked(paperId, openid) {
     .limit(1)
     .get()
   return res.data.length > 0
+}
+
+async function isFavorited(paperId, openid) {
+  if (!openid) return false
+  const res = await db.collection('exhibit_favorites')
+    .where({ paperId, openid })
+    .limit(1)
+    .get()
+  return res.data.length > 0
+}
+
+async function isFollowingUser(followerOpenid, followeeOpenid) {
+  if (!followerOpenid || !followeeOpenid || followerOpenid === followeeOpenid) return false
+  const res = await db.collection('user_follows')
+    .where({ followerOpenid, followeeOpenid })
+    .limit(1)
+    .get()
+  return res.data.length > 0
+}
+
+async function listUserLikedPapers(userOpenid) {
+  const likeRes = await db.collection('exhibit_likes')
+    .where({ openid: userOpenid })
+    .limit(100)
+    .get()
+  const sorted = sortDocsByTimeDesc(likeRes.data, 'createdAt')
+  if (sorted.length === 0) return []
+
+  const paperIds = sorted.map((item) => item.paperId).filter(Boolean)
+  const papersRes = await db.collection('papers').where({
+    _id: db.command.in(paperIds),
+    status: 'shared',
+  }).get()
+  const paperMap = new Map(papersRes.data.map((p) => [p._id, p]))
+  const docs = sorted
+    .map((item) => item.paperId)
+    .filter((id) => id && paperMap.has(id))
+    .map((id) => paperMap.get(id))
+  return buildExhibitCardList(docs)
+}
+
+async function listFavorites(openid) {
+  const favRes = await db.collection('exhibit_favorites')
+    .where({ openid })
+    .limit(100)
+    .get()
+  const sorted = sortDocsByTimeDesc(favRes.data, 'createdAt')
+  if (sorted.length === 0) return []
+
+  const paperIds = sorted.map((f) => f.paperId).filter(Boolean)
+  const papersRes = await db.collection('papers').where({
+    _id: db.command.in(paperIds),
+    status: 'shared',
+  }).get()
+  const paperMap = new Map(papersRes.data.map((p) => [p._id, p]))
+  const favMap = new Map(sorted.map((f) => [f.paperId, f]))
+
+  return sorted
+    .map((f) => f.paperId)
+    .filter((id) => id && paperMap.has(id))
+    .map((id) => {
+      const paper = paperMap.get(id)
+      const fav = favMap.get(id)
+      return {
+        id,
+        paperId: id,
+        title: paper.title || (paper.prompt || '').slice(0, 80),
+        author: paper.authorNickName || '匿名用户',
+        desc: (paper.prompt || '').slice(0, 100),
+        theme: pickTheme(paper._id),
+        favoritedAt: formatDateTime(fav.createdAt),
+      }
+    })
 }
 
 function validatePaperForShare(paper) {
@@ -254,13 +344,29 @@ exports.main = async (event) => {
 
     if (action === 'list') {
       const sort = event.sort || 'latest'
-      let query = db.collection('papers').where({ status: 'shared' })
-      if (sort === 'mine') {
+      if (sort === 'following') {
         if (!openid) {
           return { success: true, data: { list: [] } }
         }
-        query = db.collection('papers').where({ status: 'shared', openid })
+        const followRes = await db.collection('user_follows')
+          .where({ followerOpenid: openid })
+          .limit(100)
+          .get()
+        const followeeOpenids = [...new Set(
+          followRes.data.map((item) => item.followeeOpenid).filter(Boolean),
+        )]
+        if (followeeOpenids.length === 0) {
+          return { success: true, data: { list: [] } }
+        }
+        const res = await db.collection('papers').where({
+          status: 'shared',
+          openid: db.command.in(followeeOpenids),
+        }).limit(100).get()
+        const docs = sortDocsByTimeDesc(res.data, 'sharedAt')
+        const list = await buildExhibitCardList(docs)
+        return { success: true, data: { list } }
       }
+      let query = db.collection('papers').where({ status: 'shared' })
       const res = await query.limit(100).get()
       let docs = res.data
       if (sort === 'hot') {
@@ -268,7 +374,7 @@ exports.main = async (event) => {
       } else {
         docs = sortDocsByTimeDesc(docs, 'sharedAt')
       }
-      const list = docs.map(formatExhibitCard)
+      const list = await buildExhibitCardList(docs)
       return { success: true, data: { list } }
     }
 
@@ -288,7 +394,8 @@ exports.main = async (event) => {
         }),
         'sharedAt',
       )
-      return { success: true, data: { list: docs.map(formatExhibitCard) } }
+      const list = await buildExhibitCardList(docs)
+      return { success: true, data: { list } }
     }
 
     if (action === 'getDetail') {
@@ -308,6 +415,8 @@ exports.main = async (event) => {
         sortDocsByTimeDesc(commentsRes.data, 'createdAt'),
       )
       const liked = await isLiked(paperId, openid)
+      const favorited = await isFavorited(paperId, openid)
+      const following = await isFollowingUser(openid, paper.openid)
       const { author, authorAvatarUrl } = await resolveAuthorInfo(paper)
       return {
         success: true,
@@ -316,6 +425,7 @@ exports.main = async (event) => {
             id: paper._id,
             title: paper.title || (paper.prompt || '').slice(0, 80),
             author,
+            authorOpenid: paper.openid,
             authorAvatarUrl,
             likes: paper.likes || 0,
             createdAt: formatDateTime(paper.sharedAt || paper.createdAt),
@@ -325,6 +435,8 @@ exports.main = async (event) => {
             comments,
           },
           liked,
+          favorited,
+          following,
         },
       }
     }
@@ -397,6 +509,60 @@ exports.main = async (event) => {
         data: { likes: newLikes, updatedAt: db.serverDate() },
       })
       return { success: true, data: { liked: true, likes: newLikes } }
+    }
+
+    if (action === 'toggleFavorite') {
+      const paperId = event.paperId
+      if (!paperId) {
+        return { success: false, message: '缺少 paperId' }
+      }
+      const paper = await getSharedPaper(paperId)
+      if (!paper) {
+        return { success: false, message: '模板不存在或未公开' }
+      }
+      const favorited = await isFavorited(paperId, openid)
+      if (favorited) {
+        const favRes = await db.collection('exhibit_favorites')
+          .where({ paperId, openid })
+          .limit(1)
+          .get()
+        if (favRes.data[0]) {
+          await db.collection('exhibit_favorites').doc(favRes.data[0]._id).remove()
+        }
+        return { success: true, data: { favorited: false } }
+      }
+      await db.collection('exhibit_favorites').add({
+        data: { paperId, openid, createdAt: db.serverDate() },
+      })
+      return { success: true, data: { favorited: true } }
+    }
+
+    if (action === 'listFavorites') {
+      const list = await listFavorites(openid)
+      return { success: true, data: { list, total: list.length } }
+    }
+
+    if (action === 'listUserShared') {
+      const userOpenid = (event.userOpenid || '').trim()
+      if (!userOpenid) {
+        return { success: false, message: '缺少 userOpenid' }
+      }
+      const res = await db.collection('papers').where({
+        openid: userOpenid,
+        status: 'shared',
+      }).limit(100).get()
+      const docs = sortDocsByTimeDesc(res.data, 'sharedAt')
+      const list = await buildExhibitCardList(docs)
+      return { success: true, data: { list } }
+    }
+
+    if (action === 'listUserLiked') {
+      const userOpenid = (event.userOpenid || '').trim()
+      if (!userOpenid) {
+        return { success: false, message: '缺少 userOpenid' }
+      }
+      const list = await listUserLikedPapers(userOpenid)
+      return { success: true, data: { list } }
     }
 
     return { success: false, message: '未知 action' }

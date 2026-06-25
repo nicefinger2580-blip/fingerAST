@@ -1,9 +1,10 @@
 import { FILTER_TABS } from '../../utils/constants'
 import { callCloud } from '../../utils/cloud'
 import { requireLogin } from '../../utils/auth'
+import { enrichTemplateList } from '../../utils/coverArt'
 import type { TemplateItem } from '../../utils/types'
 
-const SORT_MAP = ['latest', 'hot', 'mine'] as const
+const SORT_MAP = ['latest', 'hot', 'following'] as const
 
 Page({
   data: {
@@ -27,10 +28,11 @@ Page({
   },
 
   splitWaterfall(list: TemplateItem[]) {
+    const enriched = enrichTemplateList(list)
     const left: TemplateItem[] = []
     const right: TemplateItem[] = []
-    list.forEach((item, i) => (i % 2 === 0 ? left : right).push(item))
-    this.setData({ templates: list, leftCol: left, rightCol: right })
+    enriched.forEach((item, i) => (i % 2 === 0 ? left : right).push(item))
+    this.setData({ templates: enriched, leftCol: left, rightCol: right })
   },
 
   async loadTemplates() {
@@ -71,18 +73,42 @@ Page({
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}&type=exhibit` })
   },
 
+  onMetaAvatarError(e: WechatMiniprogram.TouchEvent) {
+    const id = e.currentTarget.dataset.id as string
+    const markError = (col: TemplateItem[]) =>
+      col.map((item) => (item.id === id ? { ...item, avatarError: true } : item))
+    this.setData({
+      templates: markError(this.data.templates),
+      leftCol: markError(this.data.leftCol),
+      rightCol: markError(this.data.rightCol),
+    })
+  },
+
   onCardLongPress(e: WechatMiniprogram.TouchEvent) {
     const id = e.currentTarget.dataset.id as string
     if (!requireLogin()) return
     wx.showActionSheet({
       itemList: ['收藏', '举报'],
-      success(res) {
+      success: async (res) => {
         if (res.tapIndex === 0) {
-          wx.showToast({ title: '收藏成功', icon: 'success' })
+          try {
+            const data = await callCloud<{ favorited: boolean }>('exhibit', {
+              action: 'toggleFavorite',
+              paperId: id,
+            })
+            wx.showToast({
+              title: data.favorited ? '收藏成功' : '已取消收藏',
+              icon: data.favorited ? 'success' : 'none',
+            })
+          } catch (err) {
+            wx.showToast({
+              title: err instanceof Error ? err.message : '收藏失败',
+              icon: 'none',
+            })
+          }
         } else {
           wx.showToast({ title: '已提交举报', icon: 'none' })
         }
-        console.log('template', id)
       },
     })
   },

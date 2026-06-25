@@ -1,0 +1,139 @@
+.profile-card {
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.profile-main {
+  display: flex;
+  gap: 24rpx;
+  align-items: center;
+}
+
+.profile-avatar,
+.profile-avatar-fallback {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  flex-shrink: 0;
+}
+
+.profile-avatar-fallback {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #fff;
+  font-size: 44rpx;
+  line-height: 120rpx;
+  text-align: center;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.profile-stats {
+  display: flex;
+  gap: 32rpx;
+  margin-top: 16rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat-num {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: var(--faint);
+  margin-top: 4rpx;
+}
+
+.follow-btn {
+  margin-top: 24rpx;
+  width: 100%;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0;
+}
+
+.follow-btn::after { border: none; }
+
+.follow-btn-active {
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.tab-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: var(--muted);
+  background: #fff;
+}
+
+.tab-active {
+  color: var(--primary);
+  background: rgba(59, 124, 255, 0.1);
+  font-weight: 600;
+}
+
+.paper-item {
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.paper-cover {
+  width: 100%;
+  height: 140rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  margin-bottom: 16rpx;
+}
+
+.cover-blue { background: linear-gradient(135deg, #dbeafe, #eff6ff); }
+.cover-teal { background: linear-gradient(135deg, #ccfbf1, #ecfeff); }
+.cover-indigo { background: linear-gradient(135deg, #e0e7ff, #f5f3ff); }
+.cover-amber { background: linear-gradient(135deg, #fef3c7, #fff7ed); }
+
+.paper-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.paper-meta {
+  font-size: 22rpx;
+  margin-top: 8rpx;
+}
+
+.empty-state.compact {
+  padding: 60rpx 0;
+}

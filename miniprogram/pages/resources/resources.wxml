@@ -13,22 +13,60 @@
   </view>
 
   <view class="page-pad list-wrap">
-    <view
-      wx:for="{{list}}"
-      wx:key="id"
-      class="card resource-item"
-      bindtap="onItemTap"
-    >
-      <view class="res-icon res-{{item.tagColor}}">📁</view>
-      <view class="res-content">
-        <view class="res-title">{{item.title}}</view>
-        <view class="text-muted res-desc line-clamp-2">{{item.desc}}</view>
-        <view class="res-meta">
-          <text class="res-tag tag-{{item.tagColor}}">{{item.tag}}</text>
-          <text class="text-faint">{{item.count}}</text>
-        </view>
-      </view>
-      <text class="arrow text-faint">›</text>
+    <view wx:if="{{loading}}" class="empty-state">
+      <text class="text-muted">加载中...</text>
     </view>
+
+    <view wx:elif="{{list.length === 0}}" class="empty-state">
+      <text class="text-muted">暂无资源，请在云数据库 resources 集合中添加</text>
+    </view>
+
+    <!-- 开源素材：分组展示 -->
+    <block wx:elif="{{activeTab === 0 && groups.length > 0}}">
+      <block wx:for="{{groups}}" wx:key="subType">
+        <view class="group-title">{{item.label}}</view>
+        <view
+          wx:for="{{item.items}}"
+          wx:for-item="res"
+          wx:key="id"
+          class="card resource-item"
+          data-id="{{res.id}}"
+          bindtap="onItemTap"
+        >
+          <view class="res-icon res-{{res.tagColor}}">{{res.icon || '📁'}}</view>
+          <view class="res-content">
+            <view class="res-title">{{res.title}}</view>
+            <view class="text-muted res-desc line-clamp-2">{{res.desc}}</view>
+            <view class="res-meta">
+              <text class="res-tag tag-{{res.tagColor}}">{{res.tag}}</text>
+              <text class="text-faint">{{res.count}}</text>
+            </view>
+          </view>
+          <text class="arrow text-faint">›</text>
+        </view>
+      </block>
+    </block>
+
+    <!-- 实用工具 / 编写教程：列表展示 -->
+    <block wx:else>
+      <view
+        wx:for="{{list}}"
+        wx:key="id"
+        class="card resource-item"
+        data-id="{{item.id}}"
+        bindtap="onItemTap"
+      >
+        <view class="res-icon res-{{item.tagColor}}">{{item.icon || '📁'}}</view>
+        <view class="res-content">
+          <view class="res-title">{{item.title}}</view>
+          <view class="text-muted res-desc line-clamp-2">{{item.desc}}</view>
+          <view class="res-meta">
+            <text class="res-tag tag-{{item.tagColor}}">{{item.tag}}</text>
+            <text class="text-faint">{{item.count}}</text>
+          </view>
+        </view>
+        <text class="arrow text-faint">›</text>
+      </view>
+    </block>
   </view>
 </view>

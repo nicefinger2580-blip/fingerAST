@@ -9,14 +9,18 @@ import {
   isLoggedOut,
   isLoggedIn,
 } from '../../utils/auth'
-import type { UserProfile } from '../../utils/types'
+import { callCloud } from '../../utils/cloud'
+import type { FavoriteItem, FollowUserItem, UserProfile } from '../../utils/types'
 
 Page({
   data: {
     loggedIn: false,
     user: null as UserProfile | null,
     historyCount: 0,
-    favoritePreview: '深度学习在医学影像中的应用',
+    followingCount: 0,
+    followingPreview: null as FollowUserItem | null,
+    favoriteCount: 0,
+    favoritePreview: null as FavoriteItem | null,
   },
 
   onShow() {
@@ -26,10 +30,46 @@ Page({
     this.refreshUser()
   },
 
+  async loadFollowing() {
+    if (!getUser()?.openid) {
+      this.setData({ followingCount: 0, followingPreview: null })
+      return
+    }
+    try {
+      const data = await callCloud<{ list: FollowUserItem[]; total: number }>('login', {
+        action: 'listFollowing',
+      })
+      this.setData({
+        followingCount: data.total,
+        followingPreview: data.list[0] || null,
+      })
+    } catch {
+      this.setData({ followingCount: 0, followingPreview: null })
+    }
+  },
+
+  async loadFavorites() {
+    if (!getUser()?.openid) {
+      this.setData({ favoriteCount: 0, favoritePreview: null })
+      return
+    }
+    try {
+      const data = await callCloud<{ list: FavoriteItem[]; total: number }>('exhibit', {
+        action: 'listFavorites',
+      })
+      this.setData({
+        favoriteCount: data.total,
+        favoritePreview: data.list[0] || null,
+      })
+    } catch {
+      this.setData({ favoriteCount: 0, favoritePreview: null })
+    }
+  },
+
   async refreshUser() {
     if (isLoggedOut()) {
       getApp<IAppOption>().globalData.user = null
-      this.setData({ loggedIn: false, user: null, historyCount: 0 })
+      this.setData({ loggedIn: false, user: null, historyCount: 0, followingCount: 0, followingPreview: null, favoriteCount: 0, favoritePreview: null })
       return
     }
 
@@ -43,6 +83,8 @@ Page({
         user,
         historyCount: user.historyCount ?? 0,
       })
+      this.loadFollowing()
+      this.loadFavorites()
       return
     }
 
@@ -54,6 +96,8 @@ Page({
         user: silent,
         historyCount: silent.historyCount ?? 0,
       })
+      this.loadFollowing()
+      this.loadFavorites()
       return
     }
 
@@ -62,6 +106,10 @@ Page({
       loggedIn: false,
       user: null,
       historyCount: 0,
+      followingCount: 0,
+      followingPreview: null,
+      favoriteCount: 0,
+      favoritePreview: null,
     })
   },
 
@@ -84,6 +132,16 @@ Page({
       signin: '/pages/signin/signin',
     }
     if (routes[type]) wx.navigateTo({ url: routes[type] })
+  },
+
+  onGoFollowing() {
+    if (!requireLogin()) return
+    wx.navigateTo({ url: '/pages/following/following' })
+  },
+
+  onGoFavorites() {
+    if (!requireLogin()) return
+    wx.navigateTo({ url: '/pages/favorites/favorites' })
   },
 
   onPointsTap() {
@@ -112,6 +170,10 @@ Page({
           loggedIn: false,
           user: null,
           historyCount: 0,
+          followingCount: 0,
+          followingPreview: null,
+          favoriteCount: 0,
+          favoritePreview: null,
         })
         wx.showToast({ title: '已退出登录', icon: 'success' })
       },

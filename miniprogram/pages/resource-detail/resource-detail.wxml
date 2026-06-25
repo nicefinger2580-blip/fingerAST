@@ -1,0 +1,42 @@
+<view class="page page-pad">
+  <view wx:if="{{loading}}" class="empty-state mt-4">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <block wx:elif="{{item}}">
+    <view class="card head-card mt-3">
+      <view class="head-icon res-{{item.tagColor}}">{{item.icon || '📁'}}</view>
+      <view class="head-meta">
+        <view class="head-title">{{item.title}}</view>
+        <view class="text-muted head-desc">{{item.desc}}</view>
+        <view class="head-tags">
+          <text class="res-tag tag-{{item.tagColor}}">{{item.tag}}</text>
+          <text class="text-faint">{{item.count}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 教程 Markdown -->
+    <view wx:if="{{mode === 'tutorial'}}" class="card article-card mt-3">
+      <rich-text class="md-body" nodes="{{html}}"></rich-text>
+    </view>
+
+    <!-- 提示词素材 -->
+    <view wx:elif="{{mode === 'prompt'}}" class="card content-card mt-3">
+      <view class="content-label">提示词内容</view>
+      <text class="prompt-text" selectable>{{item.content}}</text>
+      <view class="action-row">
+        <button class="btn-secondary action-btn" bindtap="onCopyContent">复制提示词</button>
+        <button class="btn-primary action-btn" bindtap="onUsePrompt">去创作页使用</button>
+      </view>
+    </view>
+
+    <!-- 外链资源 -->
+    <view wx:else class="card content-card mt-3">
+      <view class="content-label">访问链接</view>
+      <text class="link-text" selectable>{{item.url}}</text>
+      <view class="text-faint link-tip">小程序内请复制链接后在浏览器中打开</view>
+      <button class="btn-primary mt-4" bindtap="onCopyUrl">复制链接</button>
+    </view>
+  </block>
+</view>

@@ -5,10 +5,15 @@
 
   <block wx:else>
   <view class="points-card mt-4">
-    <view class="text-faint pc-label">当前积分余额</view>
-    <view class="pc-balance">
-      <text class="pc-num">{{user.points}}</text>
-      <text class="pc-unit">积分</text>
+    <view class="pc-top">
+      <view class="pc-main">
+        <view class="text-faint pc-label">当前积分余额</view>
+        <view class="pc-balance">
+          <text class="pc-num">{{user.points}}</text>
+          <text class="pc-unit">积分</text>
+        </view>
+      </view>
+      <view class="recharge-btn" bindtap="onOpenRecharge">充值</view>
     </view>
     <view class="pc-stats">
       <view>
@@ -48,4 +53,28 @@
     </view>
   </view>
   </block>
+</view>
+
+<view wx:if="{{showRecharge}}" class="recharge-mask" bindtap="onCloseRecharge">
+  <view class="recharge-sheet" catchtap="noop">
+    <view class="sheet-head">
+      <text class="sheet-title">积分充值</text>
+      <text class="sheet-close" bindtap="onCloseRecharge">✕</text>
+    </view>
+    <view class="sheet-tip text-faint">支付成功后积分自动到账</view>
+    <view
+      wx:for="{{packs}}"
+      wx:key="id"
+      class="pack-item {{paying ? 'pack-disabled' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="onSelectPack"
+    >
+      <view class="pack-left">
+        <view class="pack-points">{{item.points}} 积分</view>
+        <view class="text-faint pack-label">{{item.label}}</view>
+      </view>
+      <view class="pack-price">¥{{item.priceYuan}}</view>
+    </view>
+    <view class="sheet-note text-faint">充值积分不可退款，请确认后支付</view>
+  </view>
 </view>

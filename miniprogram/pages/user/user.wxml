@@ -1,0 +1,95 @@
+<view class="page page-pad">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <block wx:elif="{{profile}}">
+    <view class="card profile-card">
+      <view class="profile-main">
+        <image
+          wx:if="{{profile.avatarUrl && !avatarError}}"
+          class="profile-avatar"
+          src="{{profile.avatarUrl}}"
+          mode="aspectFill"
+          binderror="onAvatarError"
+        />
+        <view wx:else class="profile-avatar profile-avatar-fallback">{{profile.nickName[0] || '?'}}</view>
+        <view class="profile-info">
+          <view class="profile-name">{{profile.nickName}}</view>
+          <view class="profile-stats">
+            <view class="stat-item">
+              <text class="stat-num">{{profile.followerCount}}</text>
+              <text class="stat-label">粉丝</text>
+            </view>
+            <view class="stat-item" bindtap="onGoFollowing" wx:if="{{profile.isSelf}}">
+              <text class="stat-num">{{profile.followingCount}}</text>
+              <text class="stat-label">关注</text>
+            </view>
+            <view class="stat-item" wx:else>
+              <text class="stat-num">{{profile.followingCount}}</text>
+              <text class="stat-label">关注</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <button
+        wx:if="{{!profile.isSelf}}"
+        class="follow-btn {{profile.following ? 'follow-btn-active' : ''}}"
+        bindtap="onToggleFollow"
+        disabled="{{followingLoading}}"
+        loading="{{followingLoading}}"
+      >{{profile.following ? '已关注' : '+ 关注'}}</button>
+    </view>
+
+    <view class="tab-row">
+      <view
+        class="tab-item {{activeTab === 0 ? 'tab-active' : ''}}"
+        data-tab="0"
+        bindtap="onTabTap"
+      >创作内容</view>
+      <view
+        class="tab-item {{activeTab === 1 ? 'tab-active' : ''}}"
+        data-tab="1"
+        bindtap="onTabTap"
+      >点赞内容</view>
+    </view>
+
+    <view wx:if="{{listLoading}}" class="empty-state compact">
+      <text class="text-muted">加载中...</text>
+    </view>
+
+    <block wx:elif="{{activeTab === 0}}">
+      <view wx:if="{{createdList.length === 0}}" class="empty-state compact">
+        <text class="text-muted">暂无分享的模板</text>
+      </view>
+      <view
+        wx:for="{{createdList}}"
+        wx:key="id"
+        class="card paper-item"
+        data-id="{{item.id}}"
+        bindtap="onViewPaper"
+      >
+        <view class="paper-cover cover-{{item.theme}}">📄</view>
+        <view class="paper-title line-clamp-2">{{item.title}}</view>
+        <view class="text-faint paper-meta">♥ {{item.likes}} · {{item.createdAt}}</view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view wx:if="{{likedList.length === 0}}" class="empty-state compact">
+        <text class="text-muted">暂无点赞的模板</text>
+      </view>
+      <view
+        wx:for="{{likedList}}"
+        wx:key="id"
+        class="card paper-item"
+        data-id="{{item.id}}"
+        bindtap="onViewPaper"
+      >
+        <view class="paper-cover cover-{{item.theme}}">📄</view>
+        <view class="paper-title line-clamp-2">{{item.title}}</view>
+        <view class="text-faint paper-meta">{{item.author}} · ♥ {{item.likes}}</view>
+      </view>
+    </block>
+  </block>
+</view>

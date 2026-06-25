@@ -1,0 +1,29 @@
+<view class="page page-pad">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <view wx:elif="{{list.length === 0}}" class="empty-state">
+    <view class="empty-icon">🔖</view>
+    <text class="text-muted">暂无收藏，去首页发现模板吧</text>
+  </view>
+
+  <block wx:else>
+    <view
+      wx:for="{{list}}"
+      wx:key="id"
+      class="card fav-item"
+    >
+      <view class="fav-cover cover-{{item.theme || 'blue'}}">📄</view>
+      <view class="fav-body" data-id="{{item.paperId}}" bindtap="onView">
+        <view class="fav-title line-clamp-2">{{item.title}}</view>
+        <view class="text-faint fav-meta">{{item.author}} · 收藏于 {{item.favoritedAt}}</view>
+        <view wx:if="{{item.desc}}" class="text-muted fav-desc line-clamp-2">{{item.desc}}</view>
+      </view>
+      <view class="fav-actions">
+        <view class="action-btn primary" data-id="{{item.paperId}}" bindtap="onView">查看</view>
+        <view class="action-btn danger" data-id="{{item.paperId}}" bindtap="onUnfavorite">取消收藏</view>
+      </view>
+    </view>
+  </block>
+</view>

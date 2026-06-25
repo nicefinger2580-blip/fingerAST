@@ -31,3 +31,9 @@ export const PROMPT_PRESETS: Record<string, string> = {
 export const PROMPT_HINT = '自由输入论文主题、研究方向或任何写作要求，AI 将根据你的描述生成全文'
 
 export const MAX_PROMPT_LEN = 1500
+
+export const RECHARGE_PACKS = [
+  { id: 'pack_60', priceYuan: 6, points: 60, label: '60积分' },
+  { id: 'pack_200', priceYuan: 18, points: 200, label: '200积分' },
+  { id: 'pack_680', priceYuan: 50, points: 680, label: '680积分' },
+] as const

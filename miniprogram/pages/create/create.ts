@@ -31,6 +31,15 @@ Page({
     if (app.globalData.createFocus) {
       app.globalData.createFocus = false
     }
+    if (app.globalData.prefillPrompt) {
+      const val = app.globalData.prefillPrompt.slice(0, MAX_PROMPT_LEN)
+      app.globalData.prefillPrompt = ''
+      this.setData({
+        prompt: val,
+        charCount: val.length,
+        status: 'input',
+      })
+    }
   },
 
   onPromptInput(e: WechatMiniprogram.Input) {

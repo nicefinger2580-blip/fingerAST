@@ -76,18 +76,40 @@
         </view>
       </view>
 
-      <view class="card fav-card mine-section">
+      <view class="card fav-card mine-section" bindtap="onGoFollowing">
         <view class="fav-head">
-          <text class="fav-title">我的收藏</text>
-          <text class="text-faint">3 篇 →</text>
+          <text class="fav-title">我的关注</text>
+          <text class="text-faint">{{followingCount}} 人 →</text>
         </view>
-        <view class="fav-item">
-          <view class="fav-icon">📄</view>
+        <view wx:if="{{followingPreview}}" class="fav-item follow-preview">
+          <image
+            wx:if="{{followingPreview.avatarUrl}}"
+            class="follow-preview-avatar"
+            src="{{followingPreview.avatarUrl}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="follow-preview-avatar follow-preview-fallback">{{followingPreview.nickName[0] || '?'}}</view>
           <view>
-            <view class="fav-name">{{favoritePreview}}</view>
-            <view class="text-faint fav-date">收藏于 06-20</view>
+            <view class="fav-name">{{followingPreview.nickName}}</view>
+            <view class="text-faint fav-date">关注于 {{followingPreview.followedAt}}</view>
           </view>
         </view>
+        <view wx:else class="fav-empty text-faint">暂无关注，去展厅发现作者</view>
+      </view>
+
+      <view class="card fav-card mine-section" bindtap="onGoFavorites">
+        <view class="fav-head">
+          <text class="fav-title">我的收藏</text>
+          <text class="text-faint">{{favoriteCount}} 篇 →</text>
+        </view>
+        <view wx:if="{{favoritePreview}}" class="fav-item">
+          <view class="fav-icon">📄</view>
+          <view>
+            <view class="fav-name line-clamp-2">{{favoritePreview.title}}</view>
+            <view class="text-faint fav-date">收藏于 {{favoritePreview.favoritedAt}}</view>
+          </view>
+        </view>
+        <view wx:else class="fav-empty text-faint">暂无收藏，去首页发现模板</view>
       </view>
 
       <view class="card settings mine-section">

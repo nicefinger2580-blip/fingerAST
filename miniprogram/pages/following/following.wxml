@@ -1,0 +1,38 @@
+<view class="page page-pad">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="text-muted">加载中...</text>
+  </view>
+
+  <view wx:elif="{{list.length === 0}}" class="empty-state">
+    <view class="empty-icon">👤</view>
+    <text class="text-muted">暂无关注，去首页发现作者吧</text>
+  </view>
+
+  <block wx:else>
+    <view
+      wx:for="{{list}}"
+      wx:key="openid"
+      class="card follow-item"
+    >
+      <view class="follow-main" data-openid="{{item.openid}}" bindtap="onViewUser">
+        <image
+          wx:if="{{item.avatarUrl && !item.avatarError}}"
+          class="follow-avatar"
+          src="{{item.avatarUrl}}"
+          mode="aspectFill"
+          data-openid="{{item.openid}}"
+          binderror="onAvatarError"
+        />
+        <view wx:else class="follow-avatar follow-avatar-fallback">{{item.nickName[0] || '?'}}</view>
+        <view class="follow-body">
+          <view class="follow-name">{{item.nickName}}</view>
+          <view class="text-faint follow-date">关注于 {{item.followedAt}}</view>
+        </view>
+      </view>
+      <view class="follow-actions">
+        <view class="action-btn primary" data-openid="{{item.openid}}" bindtap="onViewUser">主页</view>
+        <view class="action-btn danger" data-openid="{{item.openid}}" bindtap="onUnfollow">取消关注</view>
+      </view>
+    </view>
+  </block>
+</view>

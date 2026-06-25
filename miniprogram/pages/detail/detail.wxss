@@ -17,8 +17,21 @@
 .preview-title { font-size: 24rpx; color: var(--muted); line-height: 1.5; }
 
 .author-card { padding: 32rpx; }
-.author-row { display: flex; justify-content: space-between; align-items: flex-start; }
-.author-left { display: flex; gap: 16rpx; align-items: center; }
+.author-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16rpx; }
+.author-left { display: flex; gap: 16rpx; align-items: center; flex: 1; min-width: 0; }
+.follow-chip {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: var(--primary);
+  align-self: center;
+}
+.follow-chip-active {
+  background: var(--surface);
+  color: var(--muted);
+}
 .author-avatar,
 .author-avatar-img {
   width: 64rpx;
@@ -39,6 +52,7 @@
 .action-col { display: flex; flex-direction: column; align-items: center; font-size: 32rpx; }
 .action-num { font-size: 20rpx; margin-top: 4rpx; }
 .liked { color: var(--danger); }
+.favorited { color: var(--warning); }
 .desc {
   font-size: 28rpx;
   line-height: 1.6;

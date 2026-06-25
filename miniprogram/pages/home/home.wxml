@@ -13,71 +13,119 @@
         bindtap="onFilterTap"
       >{{item}}</view>
     </view>
-    </view>
+  </view>
 
-    <view class="tip-bar">
-      <text class="tip-icon">★</text>
-      <text class="text-primary tip-text">每日签到得积分，畅享 docx 导出</text>
-    </view>
+  <view class="tip-bar">
+    <text class="tip-icon">★</text>
+    <text class="text-primary tip-text">每日签到得积分，畅享 docx 导出</text>
+  </view>
 
-    <view wx:if="{{loading}}" class="empty-state">
-      <text class="text-muted">加载中...</text>
-    </view>
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="text-muted">加载中...</text>
+  </view>
 
-    <view wx:elif="{{templates.length === 0}}" class="empty-state">
-      <view class="empty-icon">📄</view>
-      <text class="text-muted">暂无展览模板，去创作并分享吧</text>
-    </view>
+  <view wx:elif="{{templates.length === 0}}" class="empty-state">
+    <view class="empty-icon">📄</view>
+    <text class="text-muted">暂无展览模板，去创作并分享吧</text>
+  </view>
 
-    <view class="waterfall" wx:else>
-      <view class="waterfall-col">
-        <view
-          wx:for="{{leftCol}}"
-          wx:key="id"
-          class="card template-card"
-          data-id="{{item.id}}"
-          bindtap="goDetail"
-          bindlongpress="onCardLongPress"
-        >
-          <view class="card-cover cover-{{item.theme}}">
-            <text class="cover-emoji">📄</text>
-          </view>
-          <view class="card-body">
-            <view class="card-title line-clamp-2">{{item.title}}</view>
-            <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
-            <view class="card-meta">
+  <view class="waterfall" wx:else>
+    <view class="waterfall-col">
+      <view
+        wx:for="{{leftCol}}"
+        wx:key="id"
+        class="card template-card"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+        bindlongpress="onCardLongPress"
+      >
+        <template is="templateCover" data="{{...item}}" />
+        <view class="card-body">
+          <view class="card-title line-clamp-2">{{item.title}}</view>
+          <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
+          <view class="card-meta">
+            <view class="meta-left">
+              <image
+                wx:if="{{item.authorAvatarUrl && !item.avatarError}}"
+                class="meta-avatar meta-avatar-img"
+                src="{{item.authorAvatarUrl}}"
+                mode="aspectFill"
+                data-id="{{item.id}}"
+                binderror="onMetaAvatarError"
+              />
+              <view wx:else class="meta-avatar">{{item.author[0] || '?'}}</view>
               <text class="text-faint meta-author">{{item.author}}</text>
-              <text class="text-faint">♥ {{item.likes}}</text>
             </view>
-          </view>
-        </view>
-      </view>
-      <view class="waterfall-col">
-        <view
-          wx:for="{{rightCol}}"
-          wx:key="id"
-          class="card template-card"
-          data-id="{{item.id}}"
-          bindtap="goDetail"
-          bindlongpress="onCardLongPress"
-        >
-          <view class="card-cover cover-{{item.theme}}">
-            <text class="cover-emoji">📄</text>
-          </view>
-          <view class="card-body">
-            <view class="card-title line-clamp-2">{{item.title}}</view>
-            <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
-            <view class="card-meta">
-              <text class="text-faint meta-author">{{item.author}}</text>
-              <text class="text-faint">♥ {{item.likes}}</text>
-            </view>
+            <text class="text-faint meta-like">♥ {{item.likes}}</text>
           </view>
         </view>
       </view>
     </view>
+    <view class="waterfall-col">
+      <view
+        wx:for="{{rightCol}}"
+        wx:key="id"
+        class="card template-card"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+        bindlongpress="onCardLongPress"
+      >
+        <template is="templateCover" data="{{...item}}" />
+        <view class="card-body">
+          <view class="card-title line-clamp-2">{{item.title}}</view>
+          <view wx:if="{{item.description}}" class="card-desc text-faint line-clamp-3">{{item.description}}</view>
+          <view class="card-meta">
+            <view class="meta-left">
+              <image
+                wx:if="{{item.authorAvatarUrl && !item.avatarError}}"
+                class="meta-avatar meta-avatar-img"
+                src="{{item.authorAvatarUrl}}"
+                mode="aspectFill"
+                data-id="{{item.id}}"
+                binderror="onMetaAvatarError"
+              />
+              <view wx:else class="meta-avatar">{{item.author[0] || '?'}}</view>
+              <text class="text-faint meta-author">{{item.author}}</text>
+            </view>
+            <text class="text-faint meta-like">♥ {{item.likes}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
 
   <view class="fab" bindtap="goCreate">
     <text class="fab-icon">+</text>
     <text>创作</text>
   </view>
 </view>
+
+<template name="templateCover">
+  <view class="card-cover cover-{{theme}} cover-pattern-{{coverPattern}} cover-size-{{coverSize}}">
+    <view class="cover-shape cover-shape-a"></view>
+    <view class="cover-shape cover-shape-b"></view>
+    <view class="cover-sheet cover-sheet-back"></view>
+    <view class="cover-sheet cover-sheet-front">
+      <view class="cover-doc-bar"></view>
+      <view class="cover-doc-inner">
+        <text class="cover-doc-label">论文模板</text>
+        <text class="cover-doc-title line-clamp-2">{{title}}</text>
+        <view class="cover-doc-divider"></view>
+        <view class="cover-doc-body">
+          <view class="cover-para">
+            <view class="cover-line"></view>
+            <view class="cover-line cover-line-92"></view>
+            <view class="cover-line cover-line-78"></view>
+          </view>
+          <view class="cover-para cover-para-gap">
+            <view class="cover-line cover-line-85"></view>
+            <view class="cover-line cover-line-68"></view>
+          </view>
+        </view>
+        <view class="cover-doc-foot">
+          <text class="cover-foot-meta">{{sectionCount || 0}} 节 · 大纲预览</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>

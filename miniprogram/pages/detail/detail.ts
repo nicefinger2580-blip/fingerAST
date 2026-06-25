@@ -11,6 +11,7 @@ Page({
     paperMode: false,
     exhibitMode: false,
     liked: false,
+    favorited: false,
     loading: true,
     commentInput: '',
     submittingComment: false,
@@ -18,6 +19,9 @@ Page({
     hasBodyContent: false,
     canComment: false,
     authorAvatarError: false,
+    authorFollowing: false,
+    followingLoading: false,
+    authorIsSelf: false,
   },
 
   setTemplateData(template: TemplateItem, extra: Record<string, unknown> = {}) {
@@ -35,6 +39,37 @@ Page({
 
   onAuthorAvatarError() {
     this.setData({ authorAvatarError: true })
+  },
+
+  onGoAuthorProfile() {
+    const openid = this.data.template?.authorOpenid
+    if (!openid || this.data.paperMode) return
+    wx.navigateTo({ url: `/pages/user/user?openid=${encodeURIComponent(openid)}` })
+  },
+
+  async onToggleFollowAuthor() {
+    const openid = this.data.template?.authorOpenid
+    if (!openid || this.data.paperMode || !this.data.exhibitMode) return
+    if (getUser()?.openid === openid) return
+    if (!requireLogin()) return
+    this.setData({ followingLoading: true })
+    try {
+      const data = await callCloud<{ following: boolean }>('login', {
+        action: 'toggleFollow',
+        targetOpenid: openid,
+      })
+      this.setData({ authorFollowing: data.following, followingLoading: false })
+      wx.showToast({
+        title: data.following ? '关注成功' : '已取消关注',
+        icon: data.following ? 'success' : 'none',
+      })
+    } catch (err) {
+      this.setData({ followingLoading: false })
+      wx.showToast({
+        title: err instanceof Error ? err.message : '操作失败',
+        icon: 'none',
+      })
+    }
   },
 
   onCommentAvatarError(e: WechatMiniprogram.BaseEvent) {
@@ -114,9 +149,14 @@ Page({
       const data = await callCloud<{
         template: TemplateItem
         liked: boolean
+        favorited: boolean
+        following: boolean
       }>('exhibit', { action: 'getDetail', paperId })
       this.setTemplateData(data.template, {
         liked: data.liked,
+        favorited: data.favorited,
+        authorFollowing: data.following,
+        authorIsSelf: getUser()?.openid === data.template.authorOpenid,
         loading: false,
         paperMode: false,
         exhibitMode: true,
@@ -160,10 +200,27 @@ Page({
     }
   },
 
-  onFavorite() {
-    if (this.data.paperMode) return
+  async onFavorite() {
+    if (!this.data.exhibitMode) return
     if (!requireLogin()) return
-    wx.showToast({ title: '收藏成功', icon: 'success' })
+    const { paperId, favorited } = this.data
+    if (!paperId) return
+    try {
+      const data = await callCloud<{ favorited: boolean }>('exhibit', {
+        action: 'toggleFavorite',
+        paperId,
+      })
+      this.setData({ favorited: data.favorited })
+      wx.showToast({
+        title: data.favorited ? '收藏成功' : '已取消收藏',
+        icon: data.favorited ? 'success' : 'none',
+      })
+    } catch (err) {
+      wx.showToast({
+        title: err instanceof Error ? err.message : '操作失败',
+        icon: 'none',
+      })
+    }
   },
 
   onCommentInput(e: WechatMiniprogram.Input) {

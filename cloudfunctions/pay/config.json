@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "openapi": [
+      "cloudPay.unifiedOrder",
+      "cloudPay.queryOrder"
+    ]
+  },
+  "timeout": 20
+}

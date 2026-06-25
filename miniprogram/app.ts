@@ -5,6 +5,7 @@ App<IAppOption>({
   globalData: {
     user: null as UserProfile | null,
     createFocus: false,
+    prefillPrompt: '',
   },
   onLaunch() {
     if (wx.cloud) {

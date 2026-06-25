@@ -99,6 +99,76 @@ async function getUserByOpenid(openid) {
   return res.data[0] || null
 }
 
+async function getUsersByOpenids(openids) {
+  const map = new Map()
+  const list = [...new Set((openids || []).filter(Boolean))]
+  if (list.length === 0) return map
+  const res = await db.collection('users').where({
+    openid: db.command.in(list.slice(0, 100)),
+  }).get()
+  res.data.forEach((user) => map.set(user.openid, user))
+  return map
+}
+
+async function batchResolveAvatarUrls(urls) {
+  const result = new Map()
+  const unique = [...new Set((urls || []).filter(Boolean))]
+  unique.forEach((url) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      result.set(url, url)
+    }
+  })
+  const cloudFiles = unique.filter((url) => url.startsWith('cloud://'))
+  for (let i = 0; i < cloudFiles.length; i += 50) {
+    const batch = cloudFiles.slice(i, i + 50)
+    try {
+      const res = await cloud.getTempFileURL({ fileList: batch })
+      ;(res.fileList || []).forEach((item) => {
+        if (item.status === 0 && item.tempFileURL) {
+          result.set(item.fileID, item.tempFileURL)
+        }
+      })
+    } catch (err) {
+      console.error('getTempFileURL failed', err)
+    }
+  }
+  return result
+}
+
+function pickResolvedAvatar(raw, map) {
+  if (!raw) return ''
+  if (map.has(raw)) return map.get(raw)
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
+  return ''
+}
+
+async function countFollowers(followeeOpenid) {
+  const res = await db.collection('user_follows').where({ followeeOpenid }).count()
+  return res.total || 0
+}
+
+async function countFollowing(followerOpenid) {
+  const res = await db.collection('user_follows').where({ followerOpenid }).count()
+  return res.total || 0
+}
+
+async function isFollowingUser(followerOpenid, followeeOpenid) {
+  if (!followerOpenid || !followeeOpenid || followerOpenid === followeeOpenid) return false
+  const res = await db.collection('user_follows')
+    .where({ followerOpenid, followeeOpenid })
+    .limit(1)
+    .get()
+  return res.data.length > 0
+}
+
+function formatShortDate(value) {
+  if (!value) return ''
+  const d = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(d.getTime())) return ''
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 async function getPaperById(paperId, openid) {
   const doc = await db.collection('papers').doc(paperId).get()
   const paper = doc.data
@@ -257,6 +327,105 @@ exports.main = async (event) => {
       await db.collection('users').doc(user._id).update({ data: update })
       const updated = await db.collection('users').doc(user._id).get()
       return { success: true, data: { user: formatUser(updated.data) } }
+    }
+
+    if (action === 'toggleFollow') {
+      const targetOpenid = (event.targetOpenid || '').trim()
+      if (!targetOpenid) {
+        return { success: false, message: '缺少 targetOpenid' }
+      }
+      if (targetOpenid === openid) {
+        return { success: false, message: '不能关注自己' }
+      }
+      const targetUser = await getUserByOpenid(targetOpenid)
+      if (!targetUser) {
+        return { success: false, message: '用户不存在' }
+      }
+      const existing = await db.collection('user_follows')
+        .where({ followerOpenid: openid, followeeOpenid: targetOpenid })
+        .limit(1)
+        .get()
+      if (existing.data[0]) {
+        await db.collection('user_follows').doc(existing.data[0]._id).remove()
+        return {
+          success: true,
+          data: {
+            following: false,
+            followerCount: await countFollowers(targetOpenid),
+          },
+        }
+      }
+      await db.collection('user_follows').add({
+        data: {
+          followerOpenid: openid,
+          followeeOpenid: targetOpenid,
+          createdAt: db.serverDate(),
+        },
+      })
+      return {
+        success: true,
+        data: {
+          following: true,
+          followerCount: await countFollowers(targetOpenid),
+        },
+      }
+    }
+
+    if (action === 'listFollowing') {
+      const followRes = await db.collection('user_follows')
+        .where({ followerOpenid: openid })
+        .limit(100)
+        .get()
+      const sorted = sortByCreatedAtDesc(followRes.data)
+      if (sorted.length === 0) {
+        return { success: true, data: { list: [], total: 0 } }
+      }
+      const followeeOpenids = sorted.map((item) => item.followeeOpenid).filter(Boolean)
+      const userMap = await getUsersByOpenids(followeeOpenids)
+      const rawAvatars = followeeOpenids.map((id) => userMap.get(id)?.avatarUrl || '')
+      const urlMap = await batchResolveAvatarUrls(rawAvatars)
+      const list = sorted.map((item) => {
+        const user = userMap.get(item.followeeOpenid)
+        const rawAvatar = user?.avatarUrl || ''
+        return {
+          openid: item.followeeOpenid,
+          nickName: user?.nickName || '微信用户',
+          avatarUrl: pickResolvedAvatar(rawAvatar, urlMap),
+          followedAt: formatShortDate(item.createdAt),
+        }
+      })
+      return { success: true, data: { list, total: list.length } }
+    }
+
+    if (action === 'getUserPublicProfile') {
+      const targetOpenid = (event.targetOpenid || '').trim()
+      if (!targetOpenid) {
+        return { success: false, message: '缺少 targetOpenid' }
+      }
+      const user = await getUserByOpenid(targetOpenid)
+      if (!user) {
+        return { success: false, message: '用户不存在' }
+      }
+      const urlMap = await batchResolveAvatarUrls([user.avatarUrl || ''])
+      const [followerCount, followingCount, following] = await Promise.all([
+        countFollowers(targetOpenid),
+        countFollowing(targetOpenid),
+        isFollowingUser(openid, targetOpenid),
+      ])
+      return {
+        success: true,
+        data: {
+          profile: {
+            openid: targetOpenid,
+            nickName: user.nickName || '微信用户',
+            avatarUrl: pickResolvedAvatar(user.avatarUrl || '', urlMap),
+            followerCount,
+            followingCount,
+            isSelf: openid === targetOpenid,
+            following,
+          },
+        },
+      }
     }
 
     if (action === 'login') {

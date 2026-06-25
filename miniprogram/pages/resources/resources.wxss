@@ -31,6 +31,18 @@
   border-radius: 2rpx;
 }
 
+.group-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 8rpx 0 16rpx;
+  padding-left: 8rpx;
+}
+
+.group-title:not(:first-child) {
+  margin-top: 32rpx;
+}
+
 .list-wrap {
   padding-top: 24rpx;
   padding-bottom: 140rpx;

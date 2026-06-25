@@ -1,0 +1,101 @@
+.head-card {
+  display: flex;
+  gap: 24rpx;
+  padding: 32rpx;
+}
+
+.head-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.res-blue { background: linear-gradient(135deg, #dbeafe, #eff6ff); }
+.res-teal { background: linear-gradient(135deg, #ccfbf1, #ecfeff); }
+.res-purple { background: linear-gradient(135deg, #ede9fe, #f5f3ff); }
+.res-amber { background: linear-gradient(135deg, #fef3c7, #fff7ed); }
+
+.head-meta { flex: 1; min-width: 0; }
+.head-title { font-size: 32rpx; font-weight: 600; line-height: 1.4; }
+.head-desc { font-size: 26rpx; line-height: 1.6; margin-top: 12rpx; }
+.head-tags { display: flex; align-items: center; gap: 16rpx; margin-top: 16rpx; }
+
+.res-tag {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+.tag-blue { background: rgba(59,124,255,0.1); color: var(--primary); }
+.tag-teal { background: rgba(91,192,190,0.15); color: var(--secondary); }
+.tag-purple { background: rgba(99,102,241,0.1); color: #6366f1; }
+.tag-amber { background: rgba(245,158,11,0.1); color: #d97706; }
+
+.article-card,
+.content-card {
+  padding: 32rpx;
+  margin-bottom: 48rpx;
+}
+
+.content-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.prompt-text,
+.link-text {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.75;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.link-tip {
+  font-size: 24rpx;
+  margin-top: 16rpx;
+  line-height: 1.6;
+}
+
+.action-row {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 32rpx;
+}
+
+.action-row .action-btn {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.md-body {
+  font-size: 28rpx;
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+.md-body .md-h1 { font-size: 40rpx; font-weight: 700; margin: 32rpx 0 16rpx; }
+.md-body .md-h2 { font-size: 34rpx; font-weight: 700; margin: 28rpx 0 14rpx; }
+.md-body .md-h3 { font-size: 30rpx; font-weight: 600; margin: 24rpx 0 12rpx; }
+.md-body .md-p { margin: 12rpx 0; color: var(--muted); }
+.md-body .md-ul, .md-body .md-ol { margin: 12rpx 0 12rpx 32rpx; }
+.md-body .md-quote {
+  border-left: 6rpx solid var(--primary);
+  padding-left: 20rpx;
+  margin: 16rpx 0;
+  color: var(--muted);
+}
+.md-body .md-pre {
+  background: var(--surface);
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  margin: 16rpx 0;
+  overflow-x: auto;
+}

@@ -10,7 +10,11 @@
     "pages/detail/detail",
     "pages/history/history",
     "pages/points/points",
-    "pages/signin/signin"
+    "pages/signin/signin",
+    "pages/resource-detail/resource-detail",
+    "pages/favorites/favorites",
+    "pages/following/following",
+    "pages/user/user"
   ],
   "window": {
     "navigationBarTitleText": "指间论文",
