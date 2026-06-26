@@ -5,7 +5,20 @@
       <view class="item-body">
         <view class="item-fill"></view>
         <view class="avatar-wrap">
-          <button class="avatar-picker" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <button
+            wx:if="{{isMiniApp}}"
+            class="avatar-picker"
+            bindtap="onPickAvatar"
+          >
+            <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
+          </button>
+          <button
+            wx:else
+            class="avatar-picker"
+            open-type="chooseAvatar"
+            bind:chooseavatar="onChooseAvatar"
+          >
             <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
             <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
           </button>

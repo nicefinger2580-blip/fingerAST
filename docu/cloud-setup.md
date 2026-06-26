@@ -57,8 +57,11 @@
 5. 右键 `cloudfunctions/resources` → **上传并部署：云端安装依赖**
 6. 右键 `cloudfunctions/pay` → **上传并部署：云端安装依赖**
 7. 右键 `cloudfunctions/payCallback` → **上传并部署：云端安装依赖**
+8. 右键 `cloudfunctions/cloudbase_auth` → **上传并部署：云端安装依赖**（多端 App 必需）
 
 > 积分充值（微信支付）配置详见 [payment-setup.md](./payment-setup.md)
+>
+> **多端 App（Android/iOS 安装包）** 额外配置详见 [miniapp-setup.md](./miniapp-setup.md)
 
 > 资源页配置详见 [resources-setup.md](./resources-setup.md)
 

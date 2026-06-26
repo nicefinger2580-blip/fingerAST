@@ -1,8 +1,30 @@
+import { isMiniAppHost } from './platform'
+
 export interface CloudResult<T = unknown> {
   success: boolean
   message?: string
   code?: string
   data?: T
+}
+
+type CloudLike = {
+  callFunction: WechatMiniprogram.Cloud['callFunction']
+  uploadFile: WechatMiniprogram.Cloud['uploadFile']
+  downloadFile: WechatMiniprogram.Cloud['downloadFile']
+}
+
+export function getCloud(): CloudLike {
+  if (isMiniAppHost()) {
+    const app = getApp<IAppOption>()
+    if (!app.cloudInstance) {
+      throw new Error('云开发未初始化，请先完成微信登录')
+    }
+    return app.cloudInstance as unknown as CloudLike
+  }
+  if (!wx.cloud) {
+    throw new Error('当前环境不支持云开发')
+  }
+  return wx.cloud as unknown as CloudLike
 }
 
 export function callCloud<T>(
@@ -11,7 +33,15 @@ export function callCloud<T>(
   options?: { slow?: boolean },
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    wx.cloud.callFunction({
+    let cloud: CloudLike
+    try {
+      cloud = getCloud()
+    } catch (err) {
+      reject(err instanceof Error ? err : new Error('云开发不可用'))
+      return
+    }
+
+    cloud.callFunction({
       name,
       data: data || {},
       slow: options?.slow,
@@ -31,7 +61,8 @@ export function callCloud<T>(
 }
 
 export async function downloadAndOpenDocx(fileID: string): Promise<void> {
-  const dl = await wx.cloud.downloadFile({ fileID })
+  const cloud = getCloud()
+  const dl = await cloud.downloadFile({ fileID })
   await wx.openDocument({
     filePath: dl.tempFilePath,
     fileType: 'docx',

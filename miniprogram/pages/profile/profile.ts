@@ -1,4 +1,5 @@
 import { getUser, updateUserProfile, requireLogin } from '../../utils/auth'
+import { isMiniAppHost, pickAvatarFromAlbum } from '../../utils/platform'
 import type { UserProfile } from '../../utils/types'
 
 Page({
@@ -6,9 +7,11 @@ Page({
     user: null as UserProfile | null,
     pendingNickName: '',
     saving: false,
+    isMiniApp: false,
   },
 
   onLoad() {
+    this.setData({ isMiniApp: isMiniAppHost() })
     if (!requireLogin()) {
       setTimeout(() => wx.navigateBack(), 300)
       return
@@ -27,9 +30,26 @@ Page({
   },
 
   async onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
-    if (this.data.saving) return
+    if (this.data.saving || this.data.isMiniApp) return
     const avatarUrl = e.detail.avatarUrl as string
     if (!avatarUrl) return
+    await this.saveAvatar(avatarUrl)
+  },
+
+  async onPickAvatar() {
+    if (this.data.saving) return
+    try {
+      const avatarUrl = await pickAvatarFromAlbum()
+      await this.saveAvatar(avatarUrl)
+    } catch (err) {
+      wx.showToast({
+        title: err instanceof Error ? err.message : '选择头像失败',
+        icon: 'none',
+      })
+    }
+  },
+
+  async saveAvatar(avatarUrl: string) {
     this.setData({ saving: true })
     wx.showLoading({ title: '保存中...' })
     try {

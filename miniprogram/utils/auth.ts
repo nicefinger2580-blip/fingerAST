@@ -1,6 +1,7 @@
 import { COST } from './constants'
 import type { UserProfile } from './types'
-import { callCloud } from './cloud'
+import { callCloud, getCloud } from './cloud'
+import { isMiniAppHost } from './platform'
 
 const USER_KEY = 'finger_user'
 const LOGGED_OUT_KEY = 'finger_logged_out'
@@ -42,6 +43,24 @@ export function goLoginPage(): void {
 }
 
 export function ensureWxSession(): Promise<void> {
+  if (isMiniAppHost()) {
+    return new Promise((resolve, reject) => {
+      wx.weixinAppLogin({
+        success: async () => {
+          try {
+            await getApp<IAppOption>().ensureCloudSession()
+            resolve()
+          } catch (err) {
+            reject(err instanceof Error ? err : new Error('云开发登录失败'))
+          }
+        },
+        fail: (err) => {
+          reject(new Error(err.errMsg || '请先安装微信并完成授权登录'))
+        },
+      })
+    })
+  }
+
   return new Promise((resolve, reject) => {
     wx.login({
       success: (res) => {
@@ -73,7 +92,8 @@ export async function uploadAvatarToCloud(tempPath: string): Promise<string> {
   const extMatch = localPath.match(/\.(\w+)(?:\?|$)/)
   const ext = extMatch ? extMatch[1] : 'png'
   const cloudPath = `avatars/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
-  const res = await wx.cloud.uploadFile({ cloudPath, filePath: localPath })
+  const cloud = getCloud()
+  const res = await cloud.uploadFile({ cloudPath, filePath: localPath })
   return res.fileID
 }
 

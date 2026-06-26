@@ -1,4 +1,5 @@
 import { cloudLogin, isLoggedIn } from '../../utils/auth'
+import { isMiniAppHost, pickAvatarFromAlbum } from '../../utils/platform'
 
 Page({
   data: {
@@ -6,9 +7,11 @@ Page({
     previewAvatar: '',
     loggingIn: false,
     canLogin: false,
+    isMiniApp: false,
   },
 
   onLoad() {
+    this.setData({ isMiniApp: isMiniAppHost() })
     if (isLoggedIn()) {
       wx.navigateBack({
         fail: () => wx.switchTab({ url: '/pages/mine/mine' }),
@@ -21,6 +24,20 @@ Page({
     if (!avatarUrl) return
     this.setData({ previewAvatar: avatarUrl })
     this.syncCanLogin()
+  },
+
+  async onPickAvatar() {
+    if (this.data.loggingIn) return
+    try {
+      const avatarUrl = await pickAvatarFromAlbum()
+      this.setData({ previewAvatar: avatarUrl })
+      this.syncCanLogin()
+    } catch (err) {
+      wx.showToast({
+        title: err instanceof Error ? err.message : '选择头像失败',
+        icon: 'none',
+      })
+    }
   },
 
   onNicknameInput(e: WechatMiniprogram.Input) {

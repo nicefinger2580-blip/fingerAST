@@ -6,5 +6,9 @@ interface IAppOption {
     createFocus: boolean
     prefillPrompt: string
   }
+  cloudInstance: WechatMiniprogram.Cloud | null
+  cloudReady: boolean
+  initCloud: () => void | Promise<void>
+  ensureCloudSession: () => Promise<void>
   syncUser: () => import('./utils/types').UserProfile | null
 }

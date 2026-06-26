@@ -47,10 +47,8 @@ Page({
       this.setData({ loading: false })
     } catch (err) {
       this.setData({ loading: false })
-      wx.showToast({
-        title: err instanceof Error ? err.message : '加载失败',
-        icon: 'none',
-      })
+      const msg = err instanceof Error ? err.message : '加载失败'
+      wx.showToast({ title: msg, icon: 'none', duration: 3000 })
     }
   },
 

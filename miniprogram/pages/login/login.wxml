@@ -16,7 +16,25 @@
         <view class="field-body">
           <view class="field-fill"></view>
           <view class="avatar-wrap">
-            <button class="avatar-picker" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+            <button
+              wx:if="{{isMiniApp}}"
+              class="avatar-picker"
+              bindtap="onPickAvatar"
+            >
+              <image
+                wx:if="{{previewAvatar}}"
+                class="preview-avatar"
+                src="{{previewAvatar}}"
+                mode="aspectFill"
+              />
+              <view wx:else class="preview-avatar preview-avatar-empty">相册选择</view>
+            </button>
+            <button
+              wx:else
+              class="avatar-picker"
+              open-type="chooseAvatar"
+              bind:chooseavatar="onChooseAvatar"
+            >
               <image
                 wx:if="{{previewAvatar}}"
                 class="preview-avatar"
@@ -50,7 +68,7 @@
 
     <view class="card auth-card">
       <view class="auth-tip text-muted">
-        点击上方头像、填写昵称后完成登录。
+        {{isMiniApp ? '点击头像从相册选择，填写昵称后登录（需跳转微信授权）。' : '点击上方头像、填写昵称后完成登录。'}}
       </view>
       <button
         class="wx-auth-btn {{canLogin ? '' : 'wx-auth-btn-disabled'}}"

@@ -12,9 +12,9 @@
     "sdkVersion": "1.7.0",
     "toolkitVersion": "0.11.0",
     "useExtendedSdk": {
-      "media": false,
+      "media": true,
       "bluetooth": false,
-      "network": false,
+      "network": true,
       "scanner": false,
       "xweb": false,
       "skyline": true
@@ -40,9 +40,9 @@
     "toolkitVersion": "0.0.9",
     "useExtendedSdk": {
       "WeAppOpenFuns": true,
-      "WeAppNetwork": false,
+      "WeAppNetwork": true,
       "WeAppBluetooth": false,
-      "WeAppMedia": false,
+      "WeAppMedia": true,
       "WeAppLBS": false,
       "WeAppOthers": false
     },
