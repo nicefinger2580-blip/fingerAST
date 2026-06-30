@@ -1,4 +1,4 @@
-import { isMiniAppHost } from './platform'
+import { getCloudApi } from './cloudInstance'
 
 export interface CloudResult<T = unknown> {
   success: boolean
@@ -7,61 +7,41 @@ export interface CloudResult<T = unknown> {
   data?: T
 }
 
-type CloudLike = {
-  callFunction: WechatMiniprogram.Cloud['callFunction']
-  uploadFile: WechatMiniprogram.Cloud['uploadFile']
-  downloadFile: WechatMiniprogram.Cloud['downloadFile']
-}
-
-export function getCloud(): CloudLike {
-  if (isMiniAppHost()) {
-    const app = getApp<IAppOption>()
-    if (!app.cloudInstance) {
-      throw new Error('云开发未初始化，请先完成微信登录')
-    }
-    return app.cloudInstance as unknown as CloudLike
-  }
-  if (!wx.cloud) {
-    throw new Error('当前环境不支持云开发')
-  }
-  return wx.cloud as unknown as CloudLike
-}
-
 export function callCloud<T>(
   name: string,
   data?: Record<string, unknown>,
   options?: { slow?: boolean },
 ): Promise<T> {
-  return new Promise((resolve, reject) => {
-    let cloud: CloudLike
-    try {
-      cloud = getCloud()
-    } catch (err) {
-      reject(err instanceof Error ? err : new Error('云开发不可用'))
-      return
-    }
-
-    cloud.callFunction({
-      name,
-      data: data || {},
-      slow: options?.slow,
-      success: (res) => {
-        const result = res.result as CloudResult<T>
-        if (!result || !result.success) {
-          reject(new Error(result?.message || '请求失败'))
-          return
-        }
-        resolve(result.data as T)
-      },
-      fail: (err) => {
-        reject(new Error(err.errMsg || '网络异常'))
-      },
-    })
-  })
+  return getCloudApi().then(
+    (cloud) =>
+      new Promise((resolve, reject) => {
+        cloud.callFunction({
+          name,
+          data: data || {},
+          slow: options?.slow,
+          success: (res) => {
+            const result = res.result as CloudResult<T>
+            if (!result || !result.success) {
+              reject(new Error(result?.message || '请求失败'))
+              return
+            }
+            resolve(result.data as T)
+          },
+          fail: (err) => {
+            const msg = err.errMsg || '网络异常'
+            if (msg.includes('cloud.callFunction:fail')) {
+              reject(new Error('云服务连接失败，多端 App 请确认已部署 cloudbase_auth 并完成环境共享配置'))
+              return
+            }
+            reject(new Error(msg))
+          },
+        })
+      }),
+  )
 }
 
 export async function downloadAndOpenDocx(fileID: string): Promise<void> {
-  const cloud = getCloud()
+  const cloud = await getCloudApi()
   const dl = await cloud.downloadFile({ fileID })
   await wx.openDocument({
     filePath: dl.tempFilePath,
@@ -69,3 +49,5 @@ export async function downloadAndOpenDocx(fileID: string): Promise<void> {
     showMenu: true,
   })
 }
+
+export { initCloud } from './cloudInstance'

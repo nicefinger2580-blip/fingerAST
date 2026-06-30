@@ -2,96 +2,93 @@
 
 将小程序转为多端 App 后，云开发、登录、头像选择与微信内小程序**不完全相同**，需完成以下配置。
 
----
-
-## 一、问题原因（你遇到的报错）
+## 常见问题
 
 | 现象 | 原因 |
 |------|------|
-| `cloud.callFunction:fail Error:rid:...` | 多端 App 内未正确初始化云开发（缺 appid/env、未登录态、未环境共享） |
-| 无法微信头像登录 | App 内不支持 `chooseAvatar`，需相册选图 + `wx.weixinAppLogin` |
-| 头像无法上传 | 云存储上传依赖云开发登录态，需先完成 App 微信登录 |
+| `cloud.callFunction:fail Error:rid:...` | 多端 App 未用跨账号云实例初始化，或缺少 `cloudbase_auth` |
+| 无法选择微信头像 | App 内不支持 `chooseAvatar`，已改为相册选图 |
+| 登录失败 | 需先 `getMiniProgramCode` 建立身份，再选头像填昵称登录 |
 
 ---
 
-## 二、必须手动完成的配置（按顺序）
+## 一、你必须手动完成的配置
 
-### 1. 注册并绑定「移动应用」
+### 1. 微信开放平台绑定
 
-1. 登录 [微信开放平台](https://open.weixin.qq.com/) → **管理中心** → **移动应用** → 创建应用并过审。
-2. 记录 **移动应用 AppID**（形如 `wxXXXXXXXX`）。
-3. 在 **微信开发者工具** → **多端应用** → 绑定该移动应用账号。
+1. 登录 [微信开放平台](https://open.weixin.qq.com/)
+2. 创建并认证 **移动应用**，记录 **移动应用 AppID**
+3. 在 **微信开发者工具** → **多端应用** 中，绑定：
+   - 开发小程序（`wxbb185e333780676b`）
+   - 上述移动应用
 
-### 2. 填写项目中的移动应用 AppID
+### 2. 云开发环境共享 + cloudbase_auth
+
+多端 App 访问小程序云环境属于**跨账号资源访问**：
+
+1. 云开发控制台 → 环境 `finger01-d5giuqcdn273e2cb8` → **设置** → 开启 **环境共享**（按控制台指引授权给调用方）
+2. 部署云函数 **`cloudbase_auth`**（本项目已提供 `cloudfunctions/cloudbase_auth`）
+   - 右键 → **上传并部署：云端安装依赖**
+3. 在云开发控制台确认该环境下存在名为 `cloudbase_auth` 的函数
+
+> 若缺少此函数，`new wx.cloud.Cloud().init()` 会失败，表现为 `cloud.callFunction:fail`。
+
+### 3. 填写移动应用 AppID（可选但建议）
 
 编辑 `miniprogram/config/cloud-env.ts`：
 
 ```typescript
-export const MOBILE_APP_APPID = 'wx你的移动应用AppID'
+export const MOBILE_APP_APPID = '你的移动应用AppID'
 ```
 
-> 留空会回退为小程序 AppID，极易导致云开发鉴权失败。
+当前代码跨账号访问云资源使用的是小程序 AppID（`resourceAppid`），此项预留给后续扩展。
 
-### 3. 云开发环境共享
+### 4. 重新编译安装包
 
-1. 微信开发者工具 → **云开发** → **更多** → **环境共享** → **添加共享**。
-2. 填入 **移动应用 AppID**（与上一步相同）。
-3. 共享环境 `finger01-d5giuqcdn273e2cb8`。
-
-### 4. 部署 `cloudbase_auth` 云函数
-
-右键 `cloudfunctions/cloudbase_auth` → **上传并部署：云端安装依赖**。
-
-多端 App 跨账号访问云资源时会调用此函数做鉴权。
-
-### 5. 重新打包 App
-
-修改 `project.miniapp.json` 后需**重新构建 APK/IPA** 并安装到手机（不能只热重载小程序代码）。
-
-已开启的扩展 SDK：
-- Android：`network: true`、`media: true`
-- iOS：`WeAppNetwork: true`、`WeAppOpenFuns: true`、`WeAppMedia: true`
-
-### 6.（可选）未登录访问
-
-若希望**未登录也能浏览首页**，在云开发控制台 → **设置** → **权限设置** → 开启 **未登录用户访问云资源**，并为各云函数配置安全规则（见[官方文档](https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/miniapp/new-capability/cloud/cloud.html)）。
-
-推荐做法仍是：**先登录再使用**，与现有积分/创作逻辑一致。
+修改代码后需重新 **构建多端 App 安装包** 并安装到手机测试（开发者工具内小程序预览无法完全模拟 App 环境）。
 
 ---
 
-## 三、App 内正确使用流程
+## 二、登录逻辑（已实现）
 
-1. 打开 App → **我的** → **登录**
-2. 从**相册选择头像**、填写昵称
-3. 点击 **微信授权登录** → 跳转微信 App 授权（`wx.weixinAppLogin`）
-4. 授权成功后云开发建立登录态，首页、积分、上传头像即可正常使用
+多端 App 内：
 
----
+1. **不再依赖** `chooseAvatar` / `type="nickname"`
+2. 用户 **从相册选择头像** + **手动输入昵称**
+3. 点击 **完成登录**
+4. 后台调用 `getMiniProgramCode` 获取登录态，再注册/登录云账号
 
-## 四、代码已做的适配
-
-| 模块 | 改动 |
-|------|------|
-| `app.ts` | 多端使用 `new wx.cloud.Cloud({ appid, resourceAppid, resourceEnv })` |
-| `utils/cloud.ts` | 统一走 `getCloud()`，兼容小程序与 App |
-| `utils/auth.ts` | App 内 `wx.weixinAppLogin` + `ensureCloudSession` |
-| 登录/资料页 | App 内用 `chooseMedia` 选头像，替代 `chooseAvatar` |
+微信内小程序仍可使用 `chooseAvatar`（若可用）。
 
 ---
 
-## 五、常见问题
+## 三、云初始化（已实现）
 
-| 错误 | 处理 |
-|------|------|
-| `sendOpenReq:fail launch wechat fail` | 多端应用未绑定移动应用 / 手机未安装微信 |
-| `10001007` 未绑定移动应用 | 完成第二节第 1 步 |
-| 云函数仍失败 | 确认环境共享、`cloudbase_auth` 已部署、`MOBILE_APP_APPID` 已填写 |
-| 小程序与 App 用户数据不一致 | App 与小程序 openid 可能不同，需开放平台绑定并用 unionid 关联（进阶） |
+| 环境 | 初始化方式 |
+|------|------------|
+| 微信内小程序 | `wx.cloud.init({ env })` |
+| 多端 App | `new wx.cloud.Cloud({ resourceAppid, resourceEnv }).init()` |
+
+相关文件：
+
+- `miniprogram/utils/cloudInstance.ts`
+- `miniprogram/utils/cloud.ts`
+- `miniprogram/app.ts`
 
 ---
 
-## 六、调试注意
+## 四、部署清单
 
-- `wx.weixinAppLogin` **不能在「移动应用助手」里调试**，必须安装真机 APK/IPA。
-- 修改 `cloud-env.ts` 或 `project.miniapp.json` 后需**重新打包**。
+- [ ] 部署 `cloudbase_auth` 云函数
+- [ ] 云开发控制台开启环境共享
+- [ ] 开放平台绑定移动应用 + 小程序
+- [ ] 重新打包 App 真机测试
+- [ ] 测试：首页加载、登录、编辑资料
+
+---
+
+## 五、仍无法使用时
+
+1. 查看云函数 `cloudbase_auth` 日志是否有来自 App 的调用
+2. 确认手机已安装微信（`getMiniProgramCode` 依赖微信客户端）
+3. 在 App 内打开 vConsole 查看 `cloud init failed` 具体报错

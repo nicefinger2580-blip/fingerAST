@@ -12,7 +12,7 @@
     "sdkVersion": "1.7.0",
     "toolkitVersion": "0.11.0",
     "useExtendedSdk": {
-      "media": true,
+      "media": false,
       "bluetooth": false,
       "network": true,
       "scanner": false,
@@ -40,11 +40,17 @@
     "toolkitVersion": "0.0.9",
     "useExtendedSdk": {
       "WeAppOpenFuns": true,
-      "WeAppNetwork": true,
+      "WeAppNetwork": false,
       "WeAppBluetooth": false,
-      "WeAppMedia": true,
+      "WeAppMedia": false,
       "WeAppLBS": false,
-      "WeAppOthers": false
+      "WeAppOthers": false,
+      "WeAppAudio": false,
+      "WeAppVideo": false,
+      "WeAppImage": false,
+      "WeAppCamera": false,
+      "WeAppLive": true,
+      "WeAppSkyline": false
     },
     "enableVConsole": "open",
     "icons": {

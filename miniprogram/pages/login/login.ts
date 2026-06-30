@@ -1,5 +1,5 @@
 import { cloudLogin, isLoggedIn } from '../../utils/auth'
-import { isMiniAppHost, pickAvatarFromAlbum } from '../../utils/platform'
+import { isMiniApp, pickAvatarImage } from '../../utils/platform'
 
 Page({
   data: {
@@ -11,7 +11,7 @@ Page({
   },
 
   onLoad() {
-    this.setData({ isMiniApp: isMiniAppHost() })
+    this.setData({ isMiniApp: isMiniApp() })
     if (isLoggedIn()) {
       wx.navigateBack({
         fail: () => wx.switchTab({ url: '/pages/mine/mine' }),
@@ -26,15 +26,15 @@ Page({
     this.syncCanLogin()
   },
 
-  async onPickAvatar() {
+  async onPickAvatarTap() {
     if (this.data.loggingIn) return
     try {
-      const avatarUrl = await pickAvatarFromAlbum()
+      const avatarUrl = await pickAvatarImage()
       this.setData({ previewAvatar: avatarUrl })
       this.syncCanLogin()
     } catch (err) {
       wx.showToast({
-        title: err instanceof Error ? err.message : '选择头像失败',
+        title: err instanceof Error ? err.message : '选择失败',
         icon: 'none',
       })
     }
@@ -57,12 +57,12 @@ Page({
     })
   },
 
-  onWechatAuth() {
+  onSubmitLogin() {
     if (this.data.loggingIn) return
     const { previewNickName, previewAvatar, canLogin } = this.data
     if (!canLogin) {
       wx.showToast({
-        title: '请先点击头像并填写昵称',
+        title: '请先选择头像并填写昵称',
         icon: 'none',
         duration: 2500,
       })

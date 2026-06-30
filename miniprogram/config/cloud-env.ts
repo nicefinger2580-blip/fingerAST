@@ -9,4 +9,4 @@ export const MINIPROGRAM_APPID = 'wxbb185e333780676b'
  * 在微信开放平台 → 管理中心 → 移动应用 中查看，并与多端应用绑定。
  * 留空时将暂用小程序 AppID，可能导致云开发鉴权失败，请务必填写。
  */
-export const MOBILE_APP_APPID = ''
+export const MOBILE_APP_APPID = 'wx23395dbf1b17f112'

@@ -6,15 +6,7 @@
         <view class="item-fill"></view>
         <view class="avatar-wrap">
           <button
-            wx:if="{{isMiniApp}}"
-            class="avatar-picker"
-            bindtap="onPickAvatar"
-          >
-            <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
-            <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
-          </button>
-          <button
-            wx:else
+            wx:if="{{!isMiniApp}}"
             class="avatar-picker"
             open-type="chooseAvatar"
             bind:chooseavatar="onChooseAvatar"
@@ -22,6 +14,10 @@
             <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
             <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
           </button>
+          <view wx:else class="avatar-picker" bindtap="onPickAvatarTap">
+            <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar-placeholder">{{user.nickName[0] || '?'}}</view>
+          </view>
         </view>
         <text class="text-faint arrow">›</text>
       </view>
@@ -34,7 +30,8 @@
       <view class="item-body">
         <input
           class="nickname-input item-fill"
-          type="nickname"
+          type="text"
+          maxlength="32"
           placeholder="点击输入昵称"
           value="{{user.nickName}}"
           bindblur="onNicknameBlur"
